@@ -27,7 +27,8 @@ $(function() {
     window.DocumentListView = Backbone.View.extend({
         el: $('#doclist'),
         initialize: function() {
-            _.bindAll(this, 'addDocument');
+            _.bindAll(this, 'addDocument'); // make 'this' work
+            documentList.bind("add", this.addDocument);
         },
         render: function() {
             documentList.each(this.addDocument);
@@ -64,7 +65,6 @@ $(function() {
         },
         addDocument: function(e) {
             var doc = documentList.create({'title': 'my title'});
-            docListView.addDocument(doc);
         }
     });
     window.toolbarView = new ToolbarView;
