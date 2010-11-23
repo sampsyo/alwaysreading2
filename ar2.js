@@ -27,6 +27,9 @@ $(function() {
     window.DocumentListView = Backbone.View.extend({
         el: $('#doclist'),
         curSelection: null,
+        events: {
+            "click": "unselect"
+        },
         initialize: function() {
             _.bindAll(this, 'addDocument'); // make 'this' work
             documentList.bind("add", this.addDocument);
@@ -38,6 +41,11 @@ $(function() {
         addDocument: function(doc) {
             var view = new DocumentItemView({model: doc});
             this.el.append(view.render().el);
+        },
+        unselect: function(e) {
+            if (this.curSelection) {
+                this.curSelection.unselect();
+            }
         }
     });
     window.docListView = new DocumentListView;
@@ -58,15 +66,20 @@ $(function() {
             this.$('.title').text(title);
         },
         select: function(e) {
+            if (docListView.curSelection == this) {
+                return false;
+            }
             $(this.el).addClass('selected');
             if (docListView.curSelection) {
                 docListView.curSelection.unselect();
             }
             docListView.curSelection = this;
+            return false;
         },
         unselect: function(e) {
             $(this.el).removeClass('selected');
             docListView.curSelection = null;
+            return false;
         }
     });
     
