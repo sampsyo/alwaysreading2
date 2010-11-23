@@ -2,7 +2,7 @@ $(function() {
     
     // Models.
     
-    window.Article = Backbone.Model.extend({
+    window.Document = Backbone.Model.extend({
         initialize: function() {
             if (!this.get("title")) {
                 this.set(
@@ -15,20 +15,20 @@ $(function() {
     
     // Collections.
     
-    window.ArticleList = Backbone.Collection.extend({
-        model: Article,
-        localStorage: new Store("articles"),
-        comparator : function(article) {
-            return article.get('title');
+    window.DocumentList = Backbone.Collection.extend({
+        model: Document,
+        localStorage: new Store("documents"),
+        comparator : function(doc) {
+            return doc.get('title');
         }
     });
     
-    window.Articles = new ArticleList;
+    window.Documents = new DocumentList;
     
     
     // Views.
     
-    window.ArticleView = Backbone.View.extend({
+    window.DocumentView = Backbone.View.extend({
         tagName: "li",
         template: _.template($('#doclistitem-template').html()),
         render: function() {
@@ -51,8 +51,8 @@ $(function() {
             "click #addBtn": "addDocument"
         },
         addDocument: function(e) {
-            var article = Articles.create({'title': 'my title'});
-            var view = new ArticleView({model: article});
+            var doc = Documents.create({'title': 'my title'});
+            var view = new DocumentView({model: doc});
             $('#doclist').append(view.render().el);
         }
     });
