@@ -1,6 +1,6 @@
 $(function() {
     
-    // Models.
+    // Model.
     
     window.Document = Backbone.Model.extend({
         initialize: function() {
@@ -11,9 +11,6 @@ $(function() {
             }
         }
     });
-    
-    
-    // Collections.
     
     window.DocumentList = Backbone.Collection.extend({
         model: Document,
@@ -26,9 +23,9 @@ $(function() {
     window.Documents = new DocumentList;
     
     
-    // Views.
+    // Document list views.
     
-    window.DocumentView = Backbone.View.extend({
+    window.DocumentItemView = Backbone.View.extend({
         tagName: "li",
         template: _.template($('#doclistitem-template').html()),
         render: function() {
@@ -43,7 +40,7 @@ $(function() {
     });
     
     
-    // Application.
+    // The toolbar controls.
     
     window.ToolbarView = Backbone.View.extend({
         el: $('#toolbar'),
@@ -52,13 +49,11 @@ $(function() {
         },
         addDocument: function(e) {
             var doc = Documents.create({'title': 'my title'});
-            var view = new DocumentView({model: doc});
+            var view = new DocumentItemView({model: doc});
             $('#doclist').append(view.render().el);
         }
     });
     
-    window.App = new ToolbarView;
+    window.Toolbar = new ToolbarView;
     
 });
-
-
