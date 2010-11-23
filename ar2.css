@@ -1,0 +1,58 @@
+#sidebar {
+    width: 18em;
+    
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    margin: 0;
+    padding: 0;
+    
+    border-right: 2px solid black;
+}
+
+#doclist {
+    width: 18em;
+    overflow-y: auto;
+    overflow-x: hidden;
+    
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 2em;
+    margin: 0;
+    
+    list-style: none;
+    padding: 0;
+}
+#doclist li {
+    margin: 0;
+    padding: 4px 10px;
+    width: 18em;
+}
+
+#toolbar {
+    width: 18em;
+    height: 2em;
+    
+    position: fixed;
+    bottom: 0;
+    margin: 0;
+    padding: 0;
+    left: 0;
+    
+    text-align: right;
+    
+    background: #ddd;
+}
+#toolbar button {
+    margin: 10px;
+}
+
+#document {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 18em;
+    margin: 0;
+}
