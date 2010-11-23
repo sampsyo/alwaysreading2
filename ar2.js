@@ -74,6 +74,7 @@ $(function() {
                 docListView.curSelection.unselect();
             }
             docListView.curSelection = this;
+            app.select(this.model);
             return false;
         },
         unselect: function(e) {
@@ -98,8 +99,24 @@ $(function() {
     window.toolbarView = new ToolbarView;
     
     
-    // Setup?
-    documentList.fetch();
-    docListView.render();
+    // Principal controller.
+    
+    window.ARApp = Backbone.Controller.extend({
+        selected: null,
+        initialize: function() {
+            _.bindAll(this, 'select');
+            
+            // Populate initial document list.
+            documentList.fetch();
+            docListView.render();
+        },
+        select: function(doc) {
+            this.selected = doc;
+            if (this.selected) {
+                console.log('selected: ' + this.selected.get('title'));
+            }
+        }
+    });
+    window.app = new ARApp;
     
 });
