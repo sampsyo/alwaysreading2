@@ -19,11 +19,26 @@ $(function() {
             return doc.get('title');
         }
     });
-    
-    window.Documents = new DocumentList;
+    window.documentList = new DocumentList;
     
     
     // Document list views.
+    
+    window.DocumentListView = Backbone.View.extend({
+        el: $('#doclist'),
+        initialize: function() {
+            _.bindAll(this, 'addDocument');
+        },
+        render: function() {
+            documentList.each(this.addDocument);
+            return this;
+        },
+        addDocument: function(doc) {
+            var view = new DocumentItemView({model: doc});
+            this.el.append(view.render().el);
+        }
+    });
+    window.docListView = new DocumentListView;
     
     window.DocumentItemView = Backbone.View.extend({
         tagName: "li",
@@ -48,12 +63,15 @@ $(function() {
             "click #addBtn": "addDocument"
         },
         addDocument: function(e) {
-            var doc = Documents.create({'title': 'my title'});
-            var view = new DocumentItemView({model: doc});
-            $('#doclist').append(view.render().el);
+            var doc = documentList.create({'title': 'my title'});
+            docListView.addDocument(doc);
         }
     });
+    window.toolbarView = new ToolbarView;
     
-    window.Toolbar = new ToolbarView;
+    
+    // Setup?
+    documentList.fetch();
+    docListView.render();
     
 });
