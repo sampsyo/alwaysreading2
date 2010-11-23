@@ -22,16 +22,24 @@
 
 <div id="document">
     <div id="docdisplay">
-        <h2 class="title"></h2>
     </div>
     <div id="docedit">
     </div>
 </div>
 
+
 <!-- templates -->
 
 <script type="text/template" id="doclistitem-template">
-    <span class="title"><%= title =></span>
+    <span class="title"><%= title %></span>
+</script>
+
+<script type="text/template" id="docdisplay-template">
+    <h1 class="title"><%= title %></h1>
+</script>
+
+<script type="text/template" id="docedit-template">
+    <input type="text" name="title" class="title"><%= title %></input>
 </script>
 
 </body>

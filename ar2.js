@@ -59,12 +59,7 @@ $(function() {
         },
         render: function() {
             $(this.el).html(this.template(this.model.toJSON()));
-            this.setContent();
             return this;
-        },
-        setContent: function() {
-            var title = this.model.get('title');
-            this.$('.title').text(title);
         },
         select: function(e) {
             if (docListView.curSelection == this) {
@@ -90,12 +85,13 @@ $(function() {
     
     window.DocumentDisplayView = Backbone.View.extend({
         el: $('#docdisplay'),
+        template: _.template($('#docdisplay-template').html()),
         initialize: function() {
             _.bindAll(this, 'display', 'hide');
         },
         display: function(doc) {
+            this.el.html(this.template(doc.toJSON()));
             this.el.show();
-            this.$('.title').text(doc.get('title'));
         },
         hide: function(doc) {
             this.el.hide();
