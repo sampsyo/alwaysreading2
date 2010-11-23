@@ -46,6 +46,7 @@ $(function() {
             if (this.curSelection) {
                 this.curSelection.unselect();
             }
+            app.select(null);
         }
     });
     window.docListView = new DocumentListView;
@@ -85,6 +86,24 @@ $(function() {
     });
     
     
+    // Document display view.
+    
+    window.DocumentDisplayView = Backbone.View.extend({
+        el: $('#docdisplay'),
+        initialize: function() {
+            _.bindAll(this, 'display', 'hide');
+        },
+        display: function(doc) {
+            this.el.show();
+            this.$('.title').text(doc.get('title'));
+        },
+        hide: function(doc) {
+            this.el.hide();
+        }
+    });
+    window.docDisplayView = new DocumentDisplayView;
+    
+    
     // The toolbar controls.
     
     window.ToolbarView = Backbone.View.extend({
@@ -113,7 +132,9 @@ $(function() {
         select: function(doc) {
             this.selected = doc;
             if (this.selected) {
-                console.log('selected: ' + this.selected.get('title'));
+                docDisplayView.display(this.selected);
+            } else {
+                docDisplayView.hide();
             }
         }
     });
