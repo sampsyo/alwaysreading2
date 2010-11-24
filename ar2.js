@@ -137,9 +137,11 @@ $(function() {
             if (this.selected) {
                 docListView.setSelected(this.selected.id);
                 docDisplayView.display(this.selected);
+                this.saveLocation('documents/' + this.selected.id);
             } else {
                 docListView.setSelected(null);
                 docDisplayView.hide();
+                this.saveLocation('');
             }
         },
         selectId: function(docId) {
