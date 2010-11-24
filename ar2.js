@@ -30,6 +30,7 @@ $(function() {
         events: {
             "click": "unselect"
         },
+        subviews: [],
         initialize: function() {
             _.bindAll(this, 'addDocument'); // make 'this' work
             documentList.bind("add", this.addDocument);
@@ -41,11 +42,20 @@ $(function() {
         addDocument: function(doc) {
             var view = new DocumentItemView({model: doc});
             this.el.append(view.render().el);
+            this.subviews[doc.id] = view;
+        },
+        setSelected: function(docId) {
+            if (this.curSelection) {
+                this.curSelection.setSelected(false);
+            }
+            if (docId) {
+                this.curSelection = this.subviews[docId];
+                this.curSelection.setSelected(true);
+            } else {
+                this.curSelection = null;
+            }
         },
         unselect: function(e) {
-            if (this.curSelection) {
-                this.curSelection.unselect();
-            }
             app.select(null);
         }
     });
@@ -61,21 +71,15 @@ $(function() {
             $(this.el).html(this.template(this.model.toJSON()));
             return this;
         },
-        select: function(e) {
-            if (docListView.curSelection == this) {
-                return false;
+        setSelected: function(selected) {
+            if (selected) {
+                $(this.el).addClass('selected');
+            } else {
+                $(this.el).removeClass('selected');
             }
-            $(this.el).addClass('selected');
-            if (docListView.curSelection) {
-                docListView.curSelection.unselect();
-            }
-            docListView.curSelection = this;
-            app.select(this.model);
-            return false;
         },
-        unselect: function(e) {
-            $(this.el).removeClass('selected');
-            docListView.curSelection = null;
+        select: function(e) {
+            app.select(this.model);
             return false;
         }
     });
@@ -128,8 +132,10 @@ $(function() {
         select: function(doc) {
             this.selected = doc;
             if (this.selected) {
+                docListView.setSelected(this.selected.id);
                 docDisplayView.display(this.selected);
             } else {
+                docListView.setSelected(null);
                 docDisplayView.hide();
             }
         }
