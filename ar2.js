@@ -122,6 +122,9 @@ $(function() {
     
     window.ARApp = Backbone.Controller.extend({
         selected: null,
+        routes: {
+            "documents/:docid": "selectId"
+        },
         initialize: function() {
             _.bindAll(this, 'select');
             
@@ -138,8 +141,12 @@ $(function() {
                 docListView.setSelected(null);
                 docDisplayView.hide();
             }
+        },
+        selectId: function(docId) {
+            this.select(documentList.get(docId));
         }
     });
     window.app = new ARApp;
+    Backbone.history.start(); // route the first hash
     
 });
