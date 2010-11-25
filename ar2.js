@@ -14,10 +14,7 @@ $(function() {
     
     window.DocumentList = Backbone.Collection.extend({
         model: Document,
-        localStorage: new Store("documents"),
-        comparator: function(doc) {
-            return doc.get('title');
-        }
+        localStorage: new Store("documents")
     });
     window.documentList = new DocumentList;
     
