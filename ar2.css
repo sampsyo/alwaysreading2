@@ -99,3 +99,22 @@ body {
     font-weight: bold;
     font-family: Helvetica, sans-serif;
 }
+
+#document #docedit input {
+    font-family: Helvetica, sans-serif;
+}
+#document #docedit .save {
+    display: block;
+    margin: 0.2em 0;
+    
+    -webkit-appearance: none;
+    background: #666;
+    border: 1px solid #333;
+    
+    color: white;
+    font-weight: bold;
+    font-size: 1em;
+}
+#document #docedit .save:hover {
+    background: black;
+}

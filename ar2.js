@@ -75,7 +75,18 @@ $(function() {
     
     window.DocumentEditView = HideShowView.extend({
         el: $('#docedit'),
-        template: _.template($('#docedit-template').html())
+        template: _.template($('#docedit-template').html()),
+        events: {
+            "submit": "submit"
+        },
+        submit: function(e) {
+            var attrs = {};
+            _.each(this.el.serializeArray(), function(o) {
+                attrs[o.name] = o.value;
+            });
+            app.saveDoc(attrs);
+            return false;
+        }
     });
     window.docEditView = new DocumentEditView;
     
@@ -137,6 +148,12 @@ $(function() {
         edit: function(doc) {
             docDisplayView.hide();
             docEditView.display(doc);
+        },
+        saveDoc: function(attrs) {
+            this.selected.set(attrs);
+            docEditView.hide();
+            docDisplayView.display(this.selected);
+            this.selected.save();
         },
         selectId: function(docId) {
             this.select(documentList.get(docId));
