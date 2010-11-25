@@ -34,13 +34,6 @@ $(function() {
             $(this.el).html(this.template(this.model.toJSON()));
             return this;
         },
-        setSelected: function(selected) {
-            if (selected) {
-                $(this.el).addClass('selected');
-            } else {
-                $(this.el).removeClass('selected');
-            }
-        },
         select: function(e) {
             app.select(this.model);
             return false;

@@ -44,8 +44,15 @@
     });
 
     Backbone.CollectionItemView = Backbone.View.extend({
+        // This function sets the "selectedness" appearance of the
+        // view. The default implementation adds or removes the
+        // "selected" class from this.el.
         setSelected: function(selected) {
-            // Implement this!
+            if (selected) {
+                $(this.el).addClass('selected');
+            } else {
+                $(this.el).removeClass('selected');
+            }
         }
     });
 
