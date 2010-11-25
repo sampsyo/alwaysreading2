@@ -94,17 +94,29 @@ body {
 
 #document .title {
     font-size: 1.5em;
-    margin: 1em 0;
+    margin: 1em 0 0;
     font-weight: bold;
     font-family: Helvetica, sans-serif;
 }
 
 #document #docedit input {
     font-family: Helvetica, sans-serif;
+    width: 400px;
+}
+#document #docedit p label {
+    display: block;
+    font-weight: bold;
+    font-size: 0.8em;
+    color: #999;
+}
+#document #docedit p input {
+    display: block;
+    font-size: 1em;
 }
 #document #docedit .save {
     display: block;
     margin: 0.2em 0;
+    width: 5em;
     
     -webkit-appearance: none;
     background: #666;

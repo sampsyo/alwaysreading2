@@ -15,7 +15,10 @@ $(function() {
     
     window.Document = Backbone.Model.extend({
         defaults: {
-            'title': 'new document'
+            'title': 'new document',
+            'link': '',
+            'due': '',
+            'tags': ''
         }
     });
     

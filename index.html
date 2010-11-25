@@ -43,6 +43,20 @@
 
 <script type="text/template" id="docedit-template">
     <input type="text" name="title" class="title" value="<%= title %>">
+    
+    <p>
+        <label for="link">link</label>
+        <input type="text" name="link" class="link" value="<%= link %>">
+    </p>
+    <p>
+        <label for="due">due</label>
+        <input type="text" name="due" class="due" value="<%= due %>">
+    </p>
+    <p>
+        <label for="tags">tags</label>
+        <input type="text" name="tags" class="tags" value="<%= tags %>">
+    </p>
+    
     <input type="submit" name="save" class="save" value="save">
 </script>
 
