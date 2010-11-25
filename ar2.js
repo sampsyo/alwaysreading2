@@ -43,7 +43,7 @@ $(function() {
         },
         edit: function(e) {
             // Single-click ("select") already called.
-            app.edit(this.model);
+            app.edit();
             return false;
         }
     });
@@ -119,16 +119,10 @@ $(function() {
             var doc = documentList.create({'title': 'my title'});
         },
         removeDocument: function(e) {
-            if (app.selected) {
-                app.selected.destroy();
-                app.selected = null;
-                docDisplayView.hide();
-            }
+            app.remove();
         },
         editDocument: function(e) {
-            if (app.selected) {
-                app.edit(app.selected);
-            }
+            app.edit();
         }
     });
     window.toolbarView = new ToolbarView;
@@ -149,6 +143,11 @@ $(function() {
             docListView.render();
         },
         select: function(doc) {
+            if (this.selected == doc) {
+                // No-op if already selected.
+                return;
+            }
+            
             this.selected = doc;
             docEditView.hide();
             if (this.selected) {
@@ -161,9 +160,18 @@ $(function() {
                 this.saveLocation('');
             }
         },
-        edit: function(doc) {
-            docDisplayView.hide();
-            docEditView.display(doc);
+        edit: function() {
+            if (this.selected) {
+                docDisplayView.hide();
+                docEditView.display(this.selected);
+            }
+        },
+        remove: function() {
+            if (this.selected) {
+                this.selected.destroy();
+                this.selected = null;
+                docDisplayView.hide();
+            }
         },
         saveDoc: function(attrs) {
             this.selected.set(attrs);
