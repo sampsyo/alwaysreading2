@@ -27,6 +27,11 @@ $(function() {
         events: {
             "click": "select",
         },
+        initialize: function() {
+            _.bindAll(this, 'render');
+            this.model.bind('change', this.render);
+            this.model.view = this;
+        },
         render: function() {
             $(this.el).html(this.template(this.model.toJSON()));
             return this;
@@ -80,11 +85,15 @@ $(function() {
             "submit": "submit"
         },
         submit: function(e) {
-            var attrs = {};
-            _.each(this.el.serializeArray(), function(o) {
-                attrs[o.name] = o.value;
-            });
-            app.saveDoc(attrs);
+            try {
+                var attrs = {};
+                _.each(this.el.serializeArray(), function(o) {
+                    attrs[o.name] = o.value;
+                });
+                app.saveDoc(attrs);
+            } catch (e) {
+                alert(e);
+            }
             return false;
         }
     });
