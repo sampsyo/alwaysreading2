@@ -26,6 +26,7 @@ $(function() {
         template: _.template($('#doclistitem-template').html()),
         events: {
             "click": "select",
+            "dblclick": "edit"
         },
         initialize: function() {
             _.bindAll(this, 'render');
@@ -38,6 +39,11 @@ $(function() {
         },
         select: function(e) {
             app.select(this.model);
+            return false;
+        },
+        edit: function(e) {
+            // Single-click ("select") already called.
+            app.edit(this.model);
             return false;
         }
     });
