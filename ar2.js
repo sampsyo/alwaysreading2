@@ -102,16 +102,15 @@ $(function() {
             "submit": "submit"
         },
         submit: function(e) {
-            try {
-                var attrs = {};
-                _.each(this.el.serializeArray(), function(o) {
-                    attrs[o.name] = o.value;
-                });
-                app.saveDoc(attrs);
-            } catch (e) {
-                alert(e);
-            }
+            app.save();
             return false;
+        },
+        values: function() {
+            var attrs = {};
+            _.each(this.el.serializeArray(), function(o) {
+                attrs[o.name] = o.value;
+            });
+            return attrs;
         }
     });
     window.docEditView = new DocumentEditView;
@@ -143,24 +142,33 @@ $(function() {
     
     window.ARApp = Backbone.Controller.extend({
         selected: null,
+        editing: false,
         routes: {
             "documents/:docid": "selectId"
         },
         initialize: function() {
-            _.bindAll(this, 'select');
+            _.bindAll(this, 'select', 'edit', 'remove', 'save');
             
             // Populate initial document list.
             documentList.fetch();
             docListView.render();
         },
+        
         select: function(doc) {
+            // No-op if already selected.
             if (this.selected == doc) {
-                // No-op if already selected.
                 return;
+            }
+            
+            
+            // Auto-save on switching away from editor.
+            if (this.editing) {
+                this.save();
             }
             
             this.selected = doc;
             docEditView.hide();
+            this.editing = false;
             if (this.selected) {
                 docListView.setSelection(this.selected.id);
                 docDisplayView.display(this.selected);
@@ -175,6 +183,7 @@ $(function() {
             if (this.selected) {
                 docDisplayView.hide();
                 docEditView.display(this.selected);
+                this.editing = true;
             }
         },
         remove: function() {
@@ -182,10 +191,12 @@ $(function() {
                 this.selected.destroy();
                 this.selected = null;
                 docDisplayView.hide();
+                docEditView.hide();
+                this.editing = false;
             }
         },
-        saveDoc: function(attrs) {
-            this.selected.set(attrs);
+        save: function() {            
+            this.selected.set(docEditView.values());
             docEditView.hide();
             docDisplayView.display(this.selected);
             this.selected.save();
