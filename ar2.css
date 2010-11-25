@@ -35,7 +35,6 @@ body {
 #doclist li {
     margin: 0;
     padding: 4px 10px;
-    width: 18em;
 }
 #doclist li .title {
     font-size: 1.1em;

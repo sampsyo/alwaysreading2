@@ -1,3 +1,14 @@
+// Simple selection disable for jQuery.
+// Cut-and-paste from:
+// http://stackoverflow.com/questions/2700000
+$.fn.disableSelection = function() {
+    $(this).attr('unselectable', 'on')
+           .css('-moz-user-select', 'none')
+           .each(function() { 
+               this.onselectstart = function() { return false; };
+            });
+};
+
 $(function() {
     
     // Model.
@@ -185,5 +196,8 @@ $(function() {
     });
     window.app = new ARApp;
     Backbone.history.start(); // route the first hash
+    
+    // Disable selection on sidebar.
+    $('#sidebar *').disableSelection();
     
 });
