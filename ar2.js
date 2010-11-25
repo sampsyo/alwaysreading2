@@ -14,12 +14,8 @@ $(function() {
     // Model.
     
     window.Document = Backbone.Model.extend({
-        initialize: function() {
-            if (!this.get("title")) {
-                this.set(
-                    {'title': 'No Title Yet'}
-                );
-            }
+        defaults: {
+            'title': 'new document'
         }
     });
     
@@ -192,7 +188,7 @@ $(function() {
             }
         },
         add: function() {
-            var doc = documentList.create({'title': 'new document'});
+            var doc = documentList.create();
             this.select(doc);
             this.edit();
             docEditView.editNew();
