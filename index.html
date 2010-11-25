@@ -17,6 +17,7 @@
     <ul id="doclist">
     </ul>
     <div id="toolbar">
+        <button id="editBtn">e</button>
         <button id="removeBtn">-</button>
         <button id="addBtn">+</button>
     </div>
@@ -41,7 +42,7 @@
 </script>
 
 <script type="text/template" id="docedit-template">
-    <input type="text" name="title" class="title"><%= title %></input>
+    <input type="text" name="title" class="title" value="<%= title %>">
 </script>
 
 </body>

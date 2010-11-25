@@ -52,11 +52,9 @@ $(function() {
     window.docListView = new DocumentListView;
     
     
-    // Document display view.
+    // Document display/edit views.
     
-    window.DocumentDisplayView = Backbone.View.extend({
-        el: $('#docdisplay'),
-        template: _.template($('#docdisplay-template').html()),
+    var HideShowView = Backbone.View.extend({
         initialize: function() {
             _.bindAll(this, 'display', 'hide');
         },
@@ -68,7 +66,18 @@ $(function() {
             this.el.hide();
         }
     });
+    
+    window.DocumentDisplayView = HideShowView.extend({
+        el: $('#docdisplay'),
+        template: _.template($('#docdisplay-template').html())
+    });
     window.docDisplayView = new DocumentDisplayView;
+    
+    window.DocumentEditView = HideShowView.extend({
+        el: $('#docedit'),
+        template: _.template($('#docedit-template').html())
+    });
+    window.docEditView = new DocumentEditView;
     
     
     // The toolbar controls.
@@ -77,7 +86,8 @@ $(function() {
         el: $('#toolbar'),
         events: {
             "click #addBtn": "addDocument",
-            "click #removeBtn": "removeDocument"
+            "click #removeBtn": "removeDocument",
+            "click #editBtn": "editDocument"
         },
         addDocument: function(e) {
             var doc = documentList.create({'title': 'my title'});
@@ -86,6 +96,11 @@ $(function() {
             if (app.selected) {
                 app.selected.destroy();
                 app.selected = null;
+            }
+        },
+        editDocument: function(e) {
+            if (app.selected) {
+                app.edit(app.selected);
             }
         }
     });
@@ -108,6 +123,7 @@ $(function() {
         },
         select: function(doc) {
             this.selected = doc;
+            docEditView.hide();
             if (this.selected) {
                 docListView.setSelection(this.selected.id);
                 docDisplayView.display(this.selected);
@@ -117,6 +133,10 @@ $(function() {
                 docDisplayView.hide();
                 this.saveLocation('');
             }
+        },
+        edit: function(doc) {
+            docDisplayView.hide();
+            docEditView.display(doc);
         },
         selectId: function(docId) {
             this.select(documentList.get(docId));

@@ -92,3 +92,10 @@ body {
 #document #docedit {
     display: none;
 }
+
+#document .title {
+    font-size: 1.5em;
+    margin: 1em 0;
+    font-weight: bold;
+    font-family: Helvetica, sans-serif;
+}
