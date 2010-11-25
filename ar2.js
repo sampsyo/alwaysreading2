@@ -29,6 +29,7 @@ $(function() {
         itemView: null, // A view for displaying a single item in the list.
         
         subviews: [],
+        selectedView: null,
         initialize: function() {
             _.bindAll(this, 'addItem');
             this.collection.bind("add", this.addItem);
@@ -42,11 +43,24 @@ $(function() {
             var view = new (this.itemView)({'model': model});
             $(this.el).append(view.render().el);
             this.subviews[model.id] = view;
-        }
+        },
+        setSelection: function(id) {
+            if (this.selectedView) {
+                this.selectedView.setSelected(false);
+            }
+            if (id) {
+                this.selectedView = this.subviews[id];
+                this.selectedView.setSelected(true);
+            } else {
+                this.selectedView = null;
+            }
+        },
     });
     
     Backbone.CollectionItemView = Backbone.View.extend({
-        // Don't do anything yet.
+        setSelected: function(selected) {
+            // Implement this!
+        }
     });
     
     
@@ -80,20 +94,8 @@ $(function() {
         itemView: DocumentItemView,
         
         el: $('#doclist'),
-        curSelection: null,
         events: {
             "click": "unselect"
-        },
-        setSelected: function(docId) {
-            if (this.curSelection) {
-                this.curSelection.setSelected(false);
-            }
-            if (docId) {
-                this.curSelection = this.subviews[docId];
-                this.curSelection.setSelected(true);
-            } else {
-                this.curSelection = null;
-            }
         },
         unselect: function(e) {
             app.select(null);
@@ -152,11 +154,11 @@ $(function() {
         select: function(doc) {
             this.selected = doc;
             if (this.selected) {
-                docListView.setSelected(this.selected.id);
+                docListView.setSelection(this.selected.id);
                 docDisplayView.display(this.selected);
                 this.saveLocation('documents/' + this.selected.id);
             } else {
-                docListView.setSelected(null);
+                docListView.setSelection(null);
                 docDisplayView.hide();
                 this.saveLocation('');
             }
