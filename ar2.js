@@ -122,6 +122,7 @@ $(function() {
             if (app.selected) {
                 app.selected.destroy();
                 app.selected = null;
+                docDisplayView.hide();
             }
         },
         editDocument: function(e) {
