@@ -111,6 +111,11 @@ $(function() {
                 attrs[o.name] = o.value;
             });
             return attrs;
+        },
+        
+        // Prepare the view for editing a new document.
+        editNew: function() {
+            this.$('.title').select();
         }
     });
     window.docEditView = new DocumentEditView;
@@ -126,7 +131,7 @@ $(function() {
             "click #editBtn": "editDocument"
         },
         addDocument: function(e) {
-            var doc = documentList.create({'title': 'my title'});
+            app.add();
         },
         removeDocument: function(e) {
             app.remove();
@@ -185,6 +190,12 @@ $(function() {
                 docEditView.display(this.selected);
                 this.editing = true;
             }
+        },
+        add: function() {
+            var doc = documentList.create({'title': 'new document'});
+            this.select(doc);
+            this.edit();
+            docEditView.editNew();
         },
         remove: function() {
             if (this.selected) {
