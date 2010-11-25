@@ -22,46 +22,37 @@ $(function() {
     window.documentList = new DocumentList;
     
     
-    // Document list views.
+    // Generic list views.
     
-    window.DocumentListView = Backbone.View.extend({
-        el: $('#doclist'),
-        curSelection: null,
-        events: {
-            "click": "unselect"
-        },
+    Backbone.CollectionView = Backbone.View.extend({
+        collection: null, // The collection being displayed.
+        itemView: null, // A view for displaying a single item in the list.
+        
         subviews: [],
         initialize: function() {
-            _.bindAll(this, 'addDocument'); // make 'this' work
-            documentList.bind("add", this.addDocument);
+            _.bindAll(this, 'addItem');
+            this.collection.bind("add", this.addItem);
         },
         render: function() {
-            documentList.each(this.addDocument);
+            this.collection.each(this.addItem);
             return this;
         },
-        addDocument: function(doc) {
-            var view = new DocumentItemView({model: doc});
-            this.el.append(view.render().el);
-            this.subviews[doc.id] = view;
-        },
-        setSelected: function(docId) {
-            if (this.curSelection) {
-                this.curSelection.setSelected(false);
-            }
-            if (docId) {
-                this.curSelection = this.subviews[docId];
-                this.curSelection.setSelected(true);
-            } else {
-                this.curSelection = null;
-            }
-        },
-        unselect: function(e) {
-            app.select(null);
+        
+        addItem: function(model) {
+            var view = new (this.itemView)({'model': model});
+            $(this.el).append(view.render().el);
+            this.subviews[model.id] = view;
         }
     });
-    window.docListView = new DocumentListView;
     
-    window.DocumentItemView = Backbone.View.extend({
+    Backbone.CollectionItemView = Backbone.View.extend({
+        // Don't do anything yet.
+    });
+    
+    
+    // Document list views.
+    
+    window.DocumentItemView = Backbone.CollectionItemView.extend({
         tagName: "li",
         template: _.template($('#doclistitem-template').html()),
         events: {
@@ -83,6 +74,32 @@ $(function() {
             return false;
         }
     });
+    
+    window.DocumentListView = Backbone.CollectionView.extend({
+        collection: documentList,
+        itemView: DocumentItemView,
+        
+        el: $('#doclist'),
+        curSelection: null,
+        events: {
+            "click": "unselect"
+        },
+        setSelected: function(docId) {
+            if (this.curSelection) {
+                this.curSelection.setSelected(false);
+            }
+            if (docId) {
+                this.curSelection = this.subviews[docId];
+                this.curSelection.setSelected(true);
+            } else {
+                this.curSelection = null;
+            }
+        },
+        unselect: function(e) {
+            app.select(null);
+        }
+    });
+    window.docListView = new DocumentListView;
     
     
     // Document display view.
