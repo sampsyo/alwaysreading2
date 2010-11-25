@@ -87,7 +87,7 @@ $(function() {
         },
         removeDocument: function(e) {
             if (app.selected) {
-                documentList.remove(app.selected);
+                app.selected.destroy();
                 app.selected = null;
             }
         }
