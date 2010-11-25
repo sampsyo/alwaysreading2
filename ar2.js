@@ -86,10 +86,17 @@ $(function() {
     window.ToolbarView = Backbone.View.extend({
         el: $('#toolbar'),
         events: {
-            "click #addBtn": "addDocument"
+            "click #addBtn": "addDocument",
+            "click #removeBtn": "removeDocument"
         },
         addDocument: function(e) {
             var doc = documentList.create({'title': 'my title'});
+        },
+        removeDocument: function(e) {
+            if (app.selected) {
+                documentList.remove(app.selected);
+                app.selected = null;
+            }
         }
     });
     window.toolbarView = new ToolbarView;

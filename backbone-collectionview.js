@@ -8,8 +8,9 @@
         subviews: [],
         selectedView: null,
         initialize: function() {
-            _.bindAll(this, 'addItem');
+            _.bindAll(this, 'addItem', 'removeItem');
             this.collection.bind("add", this.addItem);
+            this.collection.bind("remove", this.removeItem);
         },
         render: function() {
             this.collection.each(this.addItem);
@@ -21,6 +22,14 @@
             $(this.el).append(view.render().el);
             this.subviews[model.id] = view;
         },
+        removeItem: function(model) {
+            var view = this.subviews[model.id];
+            if (this.selectedView == view) {
+                this.selectedView = null;
+            }
+            view.remove();
+        },
+        
         setSelection: function(id) {
             if (this.selectedView) {
                 this.selectedView.setSelected(false);
