@@ -38,7 +38,13 @@
 </script>
 
 <script type="text/template" id="docdisplay-template">
-    <h1 class="title"><%= title %></h1>
+    <h1 class="title">
+    <% if (link) { %><a href="<%= link %>" target="_blank"><% } %>
+    <%= title %>
+    <% if (link) { %></a><% } %>
+    </h1>
+    
+    <p class="tags"><%= tags %></p>
 </script>
 
 <script type="text/template" id="docedit-template">
@@ -47,10 +53,6 @@
     <p>
         <label for="link">link</label>
         <input type="text" name="link" class="link" value="<%= link %>">
-    </p>
-    <p>
-        <label for="due">due</label>
-        <input type="text" name="due" class="due" value="<%= due %>">
     </p>
     <p>
         <label for="tags">tags</label>

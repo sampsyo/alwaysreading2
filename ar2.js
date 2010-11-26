@@ -17,7 +17,6 @@ $(function() {
         defaults: {
             'title': 'new document',
             'link': '',
-            'due': '',
             'tags': ''
         }
     });

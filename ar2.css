@@ -98,6 +98,20 @@ body {
     font-weight: bold;
     font-family: Helvetica, sans-serif;
 }
+#document #docdisplay .title {
+    margin-bottom: 0.1em;
+}
+#document #docdisplay .title a {
+    color: black;
+}
+#document #docdisplay .title a:after {
+    content: "\00BB";
+    font-size: 0.8em;
+}
+#document #docdisplay .tags {
+    margin-top: 0;
+    color: #666;
+}
 
 #document #docedit input {
     font-family: Helvetica, sans-serif;
