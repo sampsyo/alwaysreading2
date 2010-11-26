@@ -11,6 +11,10 @@ $.fn.disableSelection = function() {
 
 $(function() {
     
+    // John Gruber's URL regular expression.
+    // https://gist.github.com/249502/
+    var urlre = /\b((?:[a-z][\w-]+:(?:\/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))/gi;
+    
     // Model.
     
     window.Document = Backbone.Model.extend({
@@ -18,6 +22,24 @@ $(function() {
             'title': 'new document',
             'link': '',
             'tags': ''
+        },
+        validate: function(attrs) {
+            var errors = [];
+            
+            // Validate link.
+            if (attrs.link.match(urlre)) {
+                // Add 'http://' automatically if necessary.
+                if (!attrs.link.match(/[a-z][\w-]+:\/{1,3}/)) {
+                    attrs.link = 'http://' + attrs.link;
+                }
+            } else {
+                errors.push('link');
+            }
+            
+            if (errors.length) {
+                console.log(errors);
+                return errors;
+            }
         }
     });
     
