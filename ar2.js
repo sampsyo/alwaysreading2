@@ -37,7 +37,6 @@ $(function() {
             }
             
             if (errors.length) {
-                console.log(errors);
                 return errors;
             }
         }
@@ -121,6 +120,11 @@ $(function() {
         events: {
             "submit": "submit"
         },
+        display: function(doc) {
+            HideShowView.prototype.display.call(this, doc);
+            _.bindAll(this, 'error');
+            doc.bind('error', this.error);
+        },
         submit: function(e) {
             app.save();
             return false;
@@ -132,10 +136,12 @@ $(function() {
             });
             return attrs;
         },
-        
-        // Prepare the view for editing a new document.
-        editNew: function() {
-            this.$('.title').select();
+        error: function(model, error) {
+            console.log(error);
+            console.log(this);
+        },
+        focus: function(newDoc) {
+            this.$('.title').focus();
         }
     });
     window.docEditView = new DocumentEditView;
@@ -208,6 +214,7 @@ $(function() {
             if (this.selected) {
                 docDisplayView.hide();
                 docEditView.display(this.selected);
+                docEditView.focus(false);
                 this.editing = true;
             }
         },
@@ -215,7 +222,7 @@ $(function() {
             var doc = documentList.create();
             this.select(doc);
             this.edit();
-            docEditView.editNew();
+            docEditView.focus(true);
         },
         remove: function() {
             if (this.selected) {
