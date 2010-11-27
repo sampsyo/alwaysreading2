@@ -39,12 +39,16 @@
 
 <script type="text/template" id="docdisplay-template">
     <h1 class="title">
-    <% if (link) { %><a href="<%= link %>" target="_blank"><% } %>
-    <%= title %>
-    <% if (link) { %></a><% } %>
+        <% if (link) { %><a href="<%= link %>" target="_blank"><% } %>
+        <%= title %>
+        <% if (link) { %></a><% } %>
     </h1>
     
-    <p class="tags"><%= tags %></p>
+    <p class="tags">
+        <% for (i in tags) { %>
+            <span class="tag"><%= tags[i] %></span>
+        <% } %>
+    </p>
 </script>
 
 <script type="text/template" id="docedit-template">
@@ -55,8 +59,8 @@
         <input type="text" name="link" class="link" value="<%= link %>">
     </p>
     <p>
-        <label for="tags">tags</label>
-        <input type="text" name="tags" class="tags" value="<%= tags %>">
+        <label for="tags">tags (space-separated)</label>
+        <input type="text" name="tags" class="tags" value="<%= tagString %>">
     </p>
     
     <input type="submit" name="save" class="save" value="save">

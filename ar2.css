@@ -115,6 +115,9 @@ body {
     margin-top: 0;
     color: #666;
 }
+#document #docdisplay .tags .tag {
+    margin-right: 0.7em;
+}
 
 #document #docedit input {
     font-family: Helvetica, sans-serif;

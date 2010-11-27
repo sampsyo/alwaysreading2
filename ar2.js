@@ -21,7 +21,16 @@ $(function() {
         defaults: {
             'title': 'new document',
             'link': '',
-            'tags': ''
+            'tags': []
+        },
+        initialize: function() {
+            _.bindAll(this, 'flatten');
+        },
+        // Enhanced toJSON.
+        flatten: function() {
+            var obj = this.toJSON();
+            obj['tagString'] = this.get('tags').join(' ');
+            return obj;
         },
         validate: function(attrs) {
             var errors = [];
@@ -36,6 +45,21 @@ $(function() {
                 }
             } else {
                 errors.push('link');
+            }
+            
+            // Split tags.
+            if (typeof(attrs.tags) == 'string') {
+                var tagsstr = attrs.tags;
+                attrs.tags = [];
+                _.each(tagsstr.split(' '), function(tag) {
+                    tag = $.trim(tag);
+                    // Strip trailing comma.
+                    if (tag.length > 0 && tag.charAt(tag.length-1) == ',') {
+                        tag = tag.slice(0, tag.length-1);
+                    }
+                    tag = $.trim(tag);
+                    attrs.tags.push(tag);
+                });
             }
             
             if (errors.length) {
@@ -66,7 +90,7 @@ $(function() {
             this.model.view = this;
         },
         render: function() {
-            $(this.el).html(this.template(this.model.toJSON()));
+            $(this.el).html(this.template(this.model.flatten()));
             return this;
         },
         select: function(e) {
@@ -102,7 +126,7 @@ $(function() {
             _.bindAll(this, 'display', 'hide');
         },
         display: function(doc) {
-            this.el.html(this.template(doc.toJSON()));
+            this.el.html(this.template(doc.flatten()));
             this.el.show();
         },
         hide: function(doc) {
