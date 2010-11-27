@@ -22,4 +22,4 @@ java -jar compiler.jar $jsinargs --js_output_file $outdir/$jsout
 java -jar yuicompressor.jar $indir/$cssin > $outdir/$cssout
 
 # HTML.
-cp $indir/$htmlin $outdir/$htmlout
+awk -f production.awk $indir/$htmlin > $outdir/$htmlout
