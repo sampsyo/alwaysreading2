@@ -40,7 +40,7 @@
             } else {
                 this.selectedView = null;
             }
-        },
+        }
     });
 
     Backbone.CollectionItemView = Backbone.View.extend({
