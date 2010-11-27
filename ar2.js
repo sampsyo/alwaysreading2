@@ -27,9 +27,11 @@ $(function() {
             var errors = [];
             
             // Validate link.
-            if (attrs.link.match(urlre)) {
+            attrs.link = $.trim(attrs.link);
+            if (attrs.link == '' || attrs.link.match(urlre)) {
                 // Add 'http://' automatically if necessary.
-                if (!attrs.link.match(/[a-z][\w-]+:\/{1,3}/)) {
+                if (attrs.link != '' &&
+                            !attrs.link.match(/[a-z][\w-]+:\/{1,3}/)) {
                     attrs.link = 'http://' + attrs.link;
                 }
             } else {
