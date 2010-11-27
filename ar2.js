@@ -137,8 +137,11 @@ $(function() {
             return attrs;
         },
         error: function(model, error) {
-            console.log(error);
-            console.log(this);
+            // Mark invalid fields.
+            this.$('input').removeClass('invalid');
+            _.each(error, function(field) {
+                this.$('input.' + field).addClass('invalid');
+            });
         },
         focus: function(newDoc) {
             this.$('.title').focus();
