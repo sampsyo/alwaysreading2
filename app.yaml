@@ -1,0 +1,13 @@
+application: alwaysrdg
+version: two1
+runtime: python
+api_version: 1
+
+handlers:
+- url: /static
+  static_dir: min
+- url: /
+  static_files: min/index.html
+  upload: min/index.html
+- url: /.*
+  script: ar2.py
