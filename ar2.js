@@ -237,7 +237,10 @@ $(function() {
             }
         },
         save: function() {            
-            this.selected.set(docEditView.values());
+            if (!this.selected.set(docEditView.values())) {
+                // Validation failed.
+                return;
+            }
             docEditView.hide();
             docDisplayView.display(this.selected);
             this.selected.save();
