@@ -199,6 +199,79 @@ $(function() {
     window.toolbarView = new ToolbarView;
     
     
+    // The splash/login screen.
+    window.SplashView = Backbone.View.extend({
+        el: $('#splash'),
+        events: {
+            "click #openidSelect li a": 'choose',
+            "submit #openidEnter": 'submit'
+        },
+        initialize: function() {
+            this.$('#openidEnter').hide();
+            _.bindAll(this, 'choose', 'submit');
+            
+            // Link titles.
+            $('#openidSelect li a').each(function() {
+                $(this).attr('title', $('img', this).attr('alt'));
+            });
+        },
+        
+        urls: {
+            'Google': 'https://www.google.com/accounts/o8/id',
+            'Flickr': 'http://flickr.com/USERNAME/',
+            'Yahoo': 'http://yahoo.com/'
+        },
+        urlEnterLabel: 'Enter your OpenID:',
+        usernameEnterLabel: 'Enter your username for SITE:',
+        curSite: null,
+        
+        show: function() {
+            this.el.show();
+        },
+        
+        choose: function(e) {
+            var site = $(e.currentTarget).attr('rel');
+            if (site == 'OpenID') {
+                // Special case: raw OpenID.
+                this.$('#openidEnter label').text(this.urlEnterLabel);
+                this.$('#openidEnter').show();
+                this.$('#openidEnter input.username').focus();
+                this.curSite = 'OpenID';
+            } else {
+                var url = this.urls[site];
+                if (url.indexOf('USERNAME') == -1) {
+                    // No username in URL.
+                    this.$('#openidEnter').hide();
+                    app.login(url);
+                } else {
+                    // Username in URL.
+                    var msg = this.usernameEnterLabel;
+                    msg = msg.replace('SITE', site);
+                    this.$('#openidEnter label').text(msg);
+                    this.$('#openidEnter').show();
+                    this.$('#openidEnter input.username').focus();
+                    this.curSite = site;
+                }
+            }
+            return false;
+        },
+        submit: function(e) {
+            var username = this.$('input.username').val();
+            var url;
+            if (this.curSite == 'OpenID') {
+                url = username;
+            } else {
+                var url = this.urls[this.curSite];
+                url = url.replace('USERNAME', username);
+            }
+            
+            app.login(url);
+            return false;
+        }
+    });
+    window.splashView = new SplashView;
+    
+    
     // Principal controller.
     
     window.ARApp = Backbone.Controller.extend({
@@ -222,7 +295,7 @@ $(function() {
         ajaxError: function(obj, xhr, status, thrown) {
             if (xhr.status == 403) {
                 // Show login splash.
-                $('#splash').show();
+                splashView.show();
             } else {
                 console.log(status);
                 alert(status); //TODO
@@ -284,6 +357,12 @@ $(function() {
             docEditView.hide();
             docDisplayView.display(this.selected);
             this.selected.save();
+        },
+        
+        // Log in with a given OpenID identity.
+        login: function(identity) {
+            var target = '/login/' + escape(identity);
+            window.location.href = target;
         },
         
         // For hash URLs.

@@ -193,3 +193,54 @@ body {
     font-size: 1.5em;
     margin-top: 0.6em;
 }
+#splashbox a {
+    color: #99f;
+}
+
+#openidSelect {
+    text-align: center;
+    list-style: none;
+    padding: 0;
+    margin-left: 0;
+}
+#openidSelect li {
+    list-style: none;
+    margin: 0 2px;
+    padding: 0;
+    display: inline-block;
+}
+#openidSelect a:link, #openidSelect a:visited {
+    border: 2px solid #666;
+    background: white;
+    padding: 7px 7px 2px;
+    display: inline-block;
+}
+#openidSelect a:hover {
+    border-color: black;
+}
+#openidSelect img {
+    border-width: 0;
+}
+#openidEnter {
+    margin: 0 0 0 4px;
+}
+#openidEnter label {
+    display: block;
+    margin: 0 0 0 4px;
+}
+#openidEnter input.username {
+    width: 15em;
+    display: inline-block;
+    margin: 0 4px;
+    border: 1px solid #ccc;
+    font-size: 1.2em;
+}
+#openidEnter input.submit {
+    -khtml-appearance: none;
+    font-size: 1.2em;
+    border: 1px solid #999;
+    background: #eee;
+}
+#openidEnter input.submit:hover {
+    background: #ccc;
+}

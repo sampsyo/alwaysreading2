@@ -7,6 +7,7 @@ cssin=ar2.css
 cssout=ar2.css
 htmlin=index.html
 htmlout=index.html
+others=openid
 
 mkdir -p $outdir
 
@@ -23,3 +24,9 @@ java -jar yuicompressor.jar $indir/$cssin > $outdir/$cssout
 
 # HTML.
 awk -f production.awk $indir/$htmlin > $outdir/$htmlout
+
+# Other.
+for other in $others
+do
+    cp -r $indir/$other $outdir
+done
