@@ -202,6 +202,16 @@ def get_paper(handler, key):
 
     return paper
 
+def update_paper(paper, data):
+    for key, value in data.iteritems():
+        if key in ('description', 'link', 'tags', 'read'):
+            if key == 'link' and not value:
+                paper.link = None
+                continue
+            elif key == 'read' and value and not paper.read:
+                # Transitioning to read state. Set read date.
+                paper.readdate = datetime.datetime.now()
+            setattr(paper, key, value)
 
 # Handlers.
 
@@ -222,14 +232,7 @@ class PaperList(JSONHandler):
         
         paper = Paper()
         paper.user = user
-
-        for key, value in self.reqdata().iteritems():
-            if value and key in ('description', 'link', 'tags', 'read'):
-                if key == 'link' and not value:
-                    paper.link = None
-                    continue
-                setattr(paper, key, value)
-        
+        update_paper(paper, self.reqdata())
         paper.put()
         
         self.send(paper)
@@ -241,14 +244,7 @@ class SinglePaper(JSONHandler):
     # Update a paper.
     def put(self, paper_key):
         paper = get_paper(self, paper_key)
-        
-        for key, value in self.reqdata().iteritems():
-            if key in ('description', 'link', 'tags', 'read'):
-                if key == 'link' and not value:
-                    paper.link = None
-                    continue
-                setattr(paper, key, value)
-                
+        update_paper(paper, self.reqdata())
         paper.put()
         
         self.send(paper)
