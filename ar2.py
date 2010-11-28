@@ -197,11 +197,7 @@ class PaperList(JSONHandler):
         if tag_filter:
             not_due.filter('tags =', tag_filter)
         
-        paper_dict = {}
-        for paper in papers:
-            paper_dict[str(paper.key())] = paper
-            
-        self.send(paper_dict)
+        self.send([paper for paper in papers])
 
     # Add a new paper.
     def post(self, tag_filter=None):
