@@ -71,7 +71,7 @@ $(function() {
     
     window.DocumentList = Backbone.Collection.extend({
         model: Document,
-        localStorage: new Store("documents")
+        url: '/papers'
     });
     window.documentList = new DocumentList;
     

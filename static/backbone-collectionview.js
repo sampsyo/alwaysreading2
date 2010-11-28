@@ -8,9 +8,10 @@
         subviews: [],
         selectedView: null,
         initialize: function() {
-            _.bindAll(this, 'addItem', 'removeItem');
+            _.bindAll(this, 'addItem', 'removeItem', 'render');
             this.collection.bind("add", this.addItem);
             this.collection.bind("remove", this.removeItem);
+            this.collection.bind("refresh", this.render);
         },
         render: function() {
             this.collection.each(this.addItem);

@@ -1,7 +1,7 @@
 #!/bin/sh
 indir=static
 outdir=min
-jsfiles="lib/underscore.js lib/json2.js lib/backbone.js lib/backbone-localstorage.js backbone-collectionview.js ar2.js"
+jsfiles="lib/underscore.js lib/json2.js lib/backbone.js backbone-collectionview.js ar2.js"
 jsout=ar2.js
 cssin=ar2.css
 cssout=ar2.css
