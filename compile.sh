@@ -7,7 +7,7 @@ cssin=ar2.css
 cssout=ar2.css
 htmlin=index.html
 htmlout=index.html
-others=openid
+others="openid favicon.ico"
 
 mkdir -p $outdir
 
