@@ -15,6 +15,9 @@
         },
         render: function() {
             this.collection.each(this.addItem);
+            if (this.selectedView) {
+                this.selectedView.setSelected(true);
+            }
             return this;
         },
     

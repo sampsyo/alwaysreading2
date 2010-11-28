@@ -203,26 +203,29 @@ $(function() {
     
     window.ARApp = Backbone.Controller.extend({
         selected: null,
+        selectedId: null, // for selections before models are loaded
         editing: false,
         routes: {
             "documents/:docid": "selectId"
         },
         initialize: function() {
-            _.bindAll(this, 'select', 'edit', 'remove', 'save', 'error');
+            _.bindAll(this, 'select', 'edit', 'remove', 'save',
+                            'ajaxError', 'selectId', 'reselectId');
             
             // Populate initial document list.
-            documentList.fetch({error: this.error});
-            docListView.render();
+            documentList.fetch({
+                error: this.ajaxError,
+                success: this.reselectId
+            });
         },
         
-        error: function(obj, xhr, status, thrown) {
+        ajaxError: function(obj, xhr, status, thrown) {
             if (xhr.status == 403) {
                 // Show login splash.
                 $('#splash').show();
             } else {
                 console.log(status);
-                //TODO
-                alert(status);
+                alert(status); //TODO
             }
         },
         
@@ -231,7 +234,6 @@ $(function() {
             if (this.selected == doc) {
                 return;
             }
-            
             
             // Auto-save on switching away from editor.
             if (this.editing) {
@@ -283,8 +285,16 @@ $(function() {
             docDisplayView.display(this.selected);
             this.selected.save();
         },
+        
+        // For hash URLs.
         selectId: function(docId) {
+            this.selectedId = docId;
             this.select(documentList.get(docId));
+        },
+        reselectId: function() {
+            if (this.selectedId) {
+                this.selectId(this.selectedId);
+            }
         }
     });
     window.app = new ARApp;
