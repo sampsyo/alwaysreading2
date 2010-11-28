@@ -68,24 +68,18 @@ class ModelEncoder(json.JSONEncoder):
             return obj.user_id()
     
         return json.JSONEncoder.default(self, obj)
-
-_encoder = ModelEncoder()
-def sendjson(handler, value):
-    """Encode the value as JSON and send to the client."""
-    handler.response.out.write(_encoder.encode(value))
+_json_encoder = ModelEncoder()
 
 class JSONHandler(webapp.RequestHandler):
-    """A handler that reports errors in JSON instead of in HTML
-    and gets its request data in JSON format.
-    """
+    """A handler that reads and writes JSON."""
     def handle_exception(self, exc, debug_mode):
         if isinstance(exc, NotFoundError):
             self.error(404)
-            sendjson(self, {'error': True, 'message': 'not found'})
+            self.send({'error': True, 'message': 'not found'})
             logging.error('not found')
         elif isinstance(exc, AuthenticationError):
             self.error(403)
-            sendjson(self, {'error': True, 'message': 'not logged in'})
+            self.send({'error': True, 'message': 'not logged in'})
             logging.info('not logged in')
         else:
             exc_string = traceback.format_exc(exc)
@@ -93,26 +87,38 @@ class JSONHandler(webapp.RequestHandler):
             report = {'error': True, 'message': 'server error'}
             if debug_mode:
                 report['exception'] = exc_string
-            sendjson(self, report)
+            self.send(report)
             logging.error(exc_string)
 
     def reqdata(self):
         logging.error(self.request.body)
         return json.loads(self.request.body)
+    
+    def send(self, obj):
+        self.response.out.write(_json_encoder.encode(obj))
 
 
 # Authentication.
+
+def user_for_apikey(key):
+    """Returns a User object associated with the given API key. If none
+    match, returns None.
+    """
+    settings = Settings.all().filter('apikey =', key).get()
+    if settings:
+        return settings.user
+    return None
 
 def current_user(handler):
     """Gets the current user for the request. If an API key is specified,
     the associated user is returned. Otherwise, the currently logged-in
     user is returned. If neither are present, returns None.
     """
-    apikey = handler.request.get('apikey')
-    if apikey:
-        user = user_for_apikey(apikey)
-        if user:
-            return user
+    # apikey = handler.request.get('apikey')
+    # if apikey:
+    #     user = user_for_apikey(apikey)
+    #     if user:
+    #         return user
     return users.get_current_user()
 
 def require_user(handler):
@@ -128,6 +134,7 @@ def require_user(handler):
 # Model classes.
 
 class Paper(db.Model):
+    user = db.UserProperty()
     description = db.StringProperty()
     link = db.LinkProperty()
     tags = db.StringListProperty(default=[])
@@ -140,11 +147,17 @@ def get_paper(handler, key):
     must belong to the current user. Raises a NotFoundException if
     there is no match.
     """
+    user = current_user(handler)
+    if not user:
+        raise NotFoundException()
+        
     try:
         paper = db.get(db.Key(key))
     except datastore_errors.BadKeyError:
         raise NotFoundException()
     if not isinstance(paper, Paper):
+        raise NotFoundException()
+    if paper.user != user:
         raise NotFoundException()
 
     return paper
@@ -154,7 +167,9 @@ def get_paper(handler, key):
 
 class PaperList(JSONHandler):
     def get(self, tag_filter=None):
-        papers = Paper.all()
+        user = require_user(self)
+        
+        papers = Paper.all().filter('user =', user)
         if tag_filter:
             not_due.filter('tags =', tag_filter)
         
@@ -162,12 +177,15 @@ class PaperList(JSONHandler):
         for paper in papers:
             paper_dict[str(paper.key())] = paper
             
-        sendjson(self, paper_dict)
+        self.send(paper_dict)
 
     # Add a new paper.
     def post(self, tag_filter=None):
         #fixme tag_filter is ignored here.
+        user = require_user(self)
+        
         paper = Paper()
+        paper.user = user
 
         for key, value in self.reqdata().iteritems():
             if key in ('description', 'link', 'tags'):
@@ -175,11 +193,11 @@ class PaperList(JSONHandler):
         
         paper.put()
         
-        sendjson(self, paper)
+        self.send(paper)
 
 class SinglePaper(JSONHandler):
     def get(self, paper_key):
-        sendjson(self, get_paper(self, paper_key))
+        self.send(get_paper(self, paper_key))
 
     # Update a paper.
     def put(self, paper_key):
@@ -191,19 +209,27 @@ class SinglePaper(JSONHandler):
                 
         paper.put()
         
-        sendjson(self, paper)
+        self.send(paper)
     
     def delete(self, paper_key):
         paper = get_paper(self, paper_key)
         paper.delete()
-        sendjson(self, {'success': True})
+        self.send({'success': True})
+
+class LoginHandler(webapp.RequestHandler):
+    def get(self, identity):
+        login_url = users.create_login_url(dest_url='/',
+                                           federated_identity=identity)
+        self.redirect(login_url)
 
 
 # Application setup.
 
 application = webapp.WSGIApplication([
     (r'/papers/?', PaperList),
-    (r'/papers/(.+)', SinglePaper)
+    (r'/papers/(.+)', SinglePaper),
+    
+    (r'/login/(.+)', LoginHandler),
 ], debug=True)
 
 def main():
