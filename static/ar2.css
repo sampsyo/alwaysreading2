@@ -77,9 +77,6 @@ body {
 #toolbar button:hover {
     background: black;
 }
-#toolbar button#addBtn {
-    
-}
 
 #document {
     position: fixed;
@@ -111,12 +108,30 @@ body {
     content: "\00BB";
     font-size: 0.8em;
 }
+#document #docdisplay .description .read {
+    font-size: 0.9em;
+}
 #document #docdisplay .tags {
     margin-top: 0;
     color: #666;
 }
 #document #docdisplay .tags .tag {
     margin-right: 0.7em;
+}
+#document #docdisplay button {
+    display: block;
+    
+    -webkit-appearance: none;
+    background: #666;
+    border: 1px solid #333;
+    
+    color: white;
+    font-size: 1em;
+    
+    cursor: pointer;
+}
+#document #docdisplay button:hover {
+    background: black;
 }
 
 #document #docedit input {

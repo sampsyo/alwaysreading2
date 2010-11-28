@@ -40,15 +40,17 @@ $(function() {
             var errors = [];
             
             // Validate link.
-            attrs.link = $.trim(attrs.link);
-            if (attrs.link == '' || attrs.link.match(urlre)) {
-                // Add 'http://' automatically if necessary.
-                if (attrs.link != '' &&
-                            !attrs.link.match(/[a-z][\w-]+:\/{1,3}/)) {
-                    attrs.link = 'http://' + attrs.link;
+            if (typeof(attrs.link) == 'string') {
+                attrs.link = $.trim(attrs.link);
+                if (attrs.link == '' || attrs.link.match(urlre)) {
+                    // Add 'http://' automatically if necessary.
+                    if (attrs.link != '' &&
+                                !attrs.link.match(/[a-z][\w-]+:\/{1,3}/)) {
+                        attrs.link = 'http://' + attrs.link;
+                    }
+                } else {
+                    errors.push('link');
                 }
-            } else {
-                errors.push('link');
             }
             
             // Split tags.
@@ -140,7 +142,13 @@ $(function() {
     
     window.DocumentDisplayView = HideShowView.extend({
         el: $('#docdisplay'),
-        template: _.template($('#docdisplay-template').html())
+        template: _.template($('#docdisplay-template').html()),
+        events: {
+            "click button.readToggle": 'readToggle'
+        },
+        readToggle: function(e) {
+            app.readToggle();
+        }
     });
     window.docDisplayView = new DocumentDisplayView;
     
@@ -368,6 +376,14 @@ $(function() {
             docEditView.hide();
             docDisplayView.display(this.selected);
             this.selected.save();
+        },
+        
+        readToggle: function() {
+            if (this.selected) {
+                this.selected.set({read: !this.selected.get('read')});
+                docDisplayView.display(this.selected);
+                this.selected.save();
+            }
         },
         
         // Log in with a given OpenID identity.
