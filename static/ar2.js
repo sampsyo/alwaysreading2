@@ -365,7 +365,11 @@ $(function() {
         },
         remove: function() {
             if (this.selected) {
-                this.selected.destroy();
+                if (this.selected.isNew()) {
+                    // Do nothing?
+                } else {
+                    this.selected.destroy();
+                }
                 this.selected = null;
                 docDisplayView.hide();
                 docEditView.hide();
