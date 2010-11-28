@@ -208,7 +208,7 @@ class PaperList(JSONHandler):
         paper.user = user
 
         for key, value in self.reqdata().iteritems():
-            if key in ('description', 'link', 'tags'):
+            if value and key in ('description', 'link', 'tags'):
                 setattr(paper, key, value)
         
         paper.put()
@@ -223,8 +223,8 @@ class SinglePaper(JSONHandler):
     def put(self, paper_key):
         paper = get_paper(self, paper_key)
         
-        for key, value in self.reqdata():
-            if key in ('description', 'link', 'tags'):
+        for key, value in self.reqdata().iteritems():
+            if value and key in ('description', 'link', 'tags'):
                 setattr(paper, key, value)
                 
         paper.put()
