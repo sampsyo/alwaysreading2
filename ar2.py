@@ -1,6 +1,8 @@
 import sys
 import traceback
 import logging
+import uuid
+import urllib
 
 sys.path.insert(0, 'lib')
 try:
@@ -24,6 +26,11 @@ def render(handler, name, values):
     handler.response.out.write(
         template.render(os.path.join(TEMPLATE_DIR, name), values)
     )
+
+
+def generate_apikey():
+    """Generate a unique string of letters and numbers."""
+    return uuid.uuid4().hex
 
 
 # Exceptions.
@@ -91,14 +98,40 @@ class JSONHandler(webapp.RequestHandler):
             logging.error(exc_string)
 
     def reqdata(self):
-        logging.error(self.request.body)
-        return json.loads(self.request.body)
+        logging.error(urllib.unquote(self.request.body))
+        return json.loads(urllib.unquote(self.request.body))
     
     def send(self, obj):
         self.response.out.write(_json_encoder.encode(obj))
 
 
-# Authentication.
+# Model classes.
+
+class Paper(db.Model):
+    user = db.UserProperty()
+    description = db.StringProperty()
+    link = db.LinkProperty()
+    tags = db.StringListProperty(default=[])
+
+class Settings(db.Model):
+    user = db.UserProperty()
+    apikey = db.StringProperty()
+
+
+# User model and settings.
+
+def get_settings(user):
+    """Get the settings object for the given user."""
+    q = Settings.all().filter('user =', user)
+    settings = q.get()
+    if not settings:
+        # No settings yet! Create them.
+        settings = Settings()
+        settings.user = user
+        settings.apikey = generate_apikey()
+        settings.put()
+    
+    return settings
 
 def user_for_apikey(key):
     """Returns a User object associated with the given API key. If none
@@ -114,11 +147,11 @@ def current_user(handler):
     the associated user is returned. Otherwise, the currently logged-in
     user is returned. If neither are present, returns None.
     """
-    # apikey = handler.request.get('apikey')
-    # if apikey:
-    #     user = user_for_apikey(apikey)
-    #     if user:
-    #         return user
+    apikey = handler.request.get('apikey')
+    if apikey:
+        user = user_for_apikey(apikey)
+        if user:
+            return user
     return users.get_current_user()
 
 def require_user(handler):
@@ -129,16 +162,7 @@ def require_user(handler):
     if not user:
         raise AuthenticationError()
     return user
-
-
-# Model classes.
-
-class Paper(db.Model):
-    user = db.UserProperty()
-    description = db.StringProperty()
-    link = db.LinkProperty()
-    tags = db.StringListProperty(default=[])
-
+    
 
 # Model utilities.
 
@@ -216,6 +240,23 @@ class SinglePaper(JSONHandler):
         paper.delete()
         self.send({'success': True})
 
+class SettingsHandler(JSONHandler):
+    def get(self):
+        user = require_user(self)
+        settings = get_settings(user)
+        
+        self.send({'apikey': settings.apikey})
+
+    def post(self):
+        user = require_user(self)
+        settings = get_settings(user)
+        
+        if 'apikeyregen' in self.reqdata():
+            settings.apikey = generate_apikey()
+            settings.put()
+        
+        self.send({'apikey': settings.apikey})
+
 class LoginHandler(webapp.RequestHandler):
     def get(self, identity):
         login_url = users.create_login_url(dest_url='/',
@@ -229,6 +270,7 @@ application = webapp.WSGIApplication([
     (r'/papers/?', PaperList),
     (r'/papers/(.+)', SinglePaper),
     
+    (r'/settings', SettingsHandler),
     (r'/login/(.+)', LoginHandler),
 ], debug=True)
 
