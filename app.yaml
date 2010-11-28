@@ -5,9 +5,9 @@ api_version: 1
 
 handlers:
 - url: /static
-  static_dir: min
+  static_dir: static #min
 - url: /
-  static_files: min/index.html
+  static_files: static/index.html #min/index.html
   upload: min/index.html
 - url: /.*
   script: ar2.py
