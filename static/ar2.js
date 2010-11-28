@@ -213,9 +213,9 @@ window.paperEditView = new PaperEditView;
 
 // Source list.
 
-var SOURCE_ALL = 0;
-var SOURCE_UNREAD = 1;
-var SOURCE_READ = 2;
+var SOURCE_ALL = 'all';
+var SOURCE_UNREAD = 'unread';
+var SOURCE_READ = 'read';
 window.SourceListView = Backbone.View.extend({
     el: $('#sourcelist'),
     selected: null,
@@ -242,12 +242,12 @@ window.SourceListView = Backbone.View.extend({
         
         this.$('li').removeClass('selected');
     
-        var idx = this.options.indexOf(source);
+        var idx = $.inArray(source, this.options);
         this.$('li').eq(idx).addClass('selected');
     },
     itemClick: function(e) {
         var idx = this.$('li').index(e.currentTarget);
-        app.setSource(this.options[idx]);
+        app.setSource(this.options[idx], true);
     }
 });
 window.sourceListView = new SourceListView;
@@ -355,18 +355,30 @@ window.ARApp = Backbone.Controller.extend({
     selected: null,
     selectedId: null, // for selections before models are loaded
     editing: false,
+    source: null,
     routes: {
-        "papers/:pid": "selectId"
+        ":source": "selectItem",
+        ":source/:paperid": "selectItem"
     },
     initialize: function() {
         _.bindAll(this, 'select', 'edit', 'remove', 'save',
-                        'ajaxError', 'selectId', 'reselectId');
+                        'ajaxError', 'selectItem', 'reselectId');
+        
+        // Initial source selection.
+        this.setSource(SOURCE_UNREAD);
         
         // Populate initial paper list.
         paperList.fetch({
             error: this.ajaxError,
             success: this.reselectId
         });
+    },
+    curPath: function() {
+        var path = this.source; //TODO assuming source is name
+        if (this.selected) {
+            path += '/' + this.selected.id
+        }
+        return path;
     },
     
     ajaxError: function(obj, xhr, status, thrown) {
@@ -398,14 +410,13 @@ window.ARApp = Backbone.Controller.extend({
                 paperListView.setSelection(null);
             } else {
                 paperListView.setSelection(this.selected);
-                this.saveLocation('papers/' + this.selected.id);
             }
             paperDisplayView.display(this.selected);
         } else {
             paperListView.setSelection(null);
             paperDisplayView.hide();
-            this.saveLocation('');
-        }
+        }    
+        this.saveLocation(this.curPath());
     },
     edit: function() {
         if (this.selected) {
@@ -462,9 +473,15 @@ window.ARApp = Backbone.Controller.extend({
         }
     },
     
-    setSource: function(source) {
-        console.log(source);
-        sourceListView.select(source);
+    setSource: function(source, topLevel) {
+        if (this.source != source) {
+            sourceListView.select(source);
+            this.source = source;
+            
+            if (topLevel) {
+                this.select(null, true);
+            }
+        }
     },
     
     // Log in with a given OpenID identity.
@@ -474,13 +491,17 @@ window.ARApp = Backbone.Controller.extend({
     },
     
     // For hash URLs.
-    selectId: function(paperId) {
+    selectItem: function(sourceName, paperId) {
+        if (sourceName) {
+            var source = sourceName; //TODO assume source is name
+            this.setSource(source);
+        }        
         this.selectedId = paperId;
         this.select(paperList.get(paperId));
     },
     reselectId: function() {
         if (this.selectedId) {
-            this.selectId(this.selectedId);
+            this.selectItem(null, this.selectedId);
         }
     }
 });
