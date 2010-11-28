@@ -211,6 +211,48 @@ window.PaperEditView = HideShowView.extend({
 window.paperEditView = new PaperEditView;
 
 
+// Source list.
+
+var SOURCE_ALL = 0;
+var SOURCE_UNREAD = 1;
+var SOURCE_READ = 2;
+window.SourceListView = Backbone.View.extend({
+    el: $('#sourcelist'),
+    selected: null,
+    options: [],
+    initialize: function() {
+        _.bindAll(this, 'itemClick');
+        this.$('li').live('click', this.itemClick);
+        
+        this.clear();
+        this.add('All', SOURCE_ALL);
+        this.add('Unread', SOURCE_UNREAD);
+        this.add('Read', SOURCE_READ);
+    },
+    clear: function() {
+        this.el.empty();
+        this.options = [];
+    },
+    add: function(title, value) {
+        this.el.append('<li>' + title + '</li>');
+        this.options.push(value);
+    },
+    select: function(source) {
+        this.selected = source;
+        
+        this.$('li').removeClass('selected');
+    
+        var idx = this.options.indexOf(source);
+        this.$('li').eq(idx).addClass('selected');
+    },
+    itemClick: function(e) {
+        var idx = this.$('li').index(e.currentTarget);
+        app.setSource(this.options[idx]);
+    }
+});
+window.sourceListView = new SourceListView;
+
+
 // The toolbar controls.
 
 window.ToolbarView = Backbone.View.extend({
@@ -418,6 +460,11 @@ window.ARApp = Backbone.Controller.extend({
             paperDisplayView.display(this.selected);
             this.selected.save();
         }
+    },
+    
+    setSource: function(source) {
+        console.log(source);
+        sourceListView.select(source);
     },
     
     // Log in with a given OpenID identity.
