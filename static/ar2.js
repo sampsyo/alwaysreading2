@@ -208,11 +208,22 @@ $(function() {
             "documents/:docid": "selectId"
         },
         initialize: function() {
-            _.bindAll(this, 'select', 'edit', 'remove', 'save');
+            _.bindAll(this, 'select', 'edit', 'remove', 'save', 'error');
             
             // Populate initial document list.
-            documentList.fetch();
+            documentList.fetch({error: this.error});
             docListView.render();
+        },
+        
+        error: function(obj, xhr, status, thrown) {
+            if (xhr.status == 403) {
+                // Show login splash.
+                $('#splash').show();
+            } else {
+                console.log(status);
+                //TODO
+                alert(status);
+            }
         },
         
         select: function(doc) {

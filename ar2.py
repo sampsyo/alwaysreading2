@@ -255,9 +255,14 @@ class SettingsHandler(JSONHandler):
 
 class LoginHandler(webapp.RequestHandler):
     def get(self, identity):
-        login_url = users.create_login_url(dest_url='/',
-                                           federated_identity=identity)
-        self.redirect(login_url)
+        url = users.create_login_url(dest_url='/',
+                                     federated_identity=identity)
+        self.redirect(url)
+
+class LogoutHandler(webapp.RequestHandler):
+    def get(self):
+        url = users.create_logout_url('/')
+        self.redirect(url)
 
 
 # Application setup.
@@ -268,6 +273,7 @@ application = webapp.WSGIApplication([
     
     (r'/settings', SettingsHandler),
     (r'/login/(.+)', LoginHandler),
+    (r'/logout', LogoutHandler),
 ], debug=True)
 
 def main():

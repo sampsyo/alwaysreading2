@@ -154,3 +154,42 @@ body {
 #document #docedit .save:hover {
     background: black;
 }
+
+#splash {
+    display: none;
+
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+#splash #screen {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: black;
+    opacity: 0.4;
+}
+#splashbox {
+    position: absolute;
+    top: 3em;
+    left: 50%;
+    margin-left: -15em;
+    width: 30em;
+    
+    border: 1px solid black;
+    background: #666;
+    color: white;
+    padding: 0 1em;
+    
+    box-shadow: 0 0 20px #666;
+    -webkit-box-shadow: 3px 3px 5px #333;
+    -moz-box-shadow: 0 0 20px #666;
+}
+#splashbox h2 {
+    font-size: 1.5em;
+    margin-top: 0.6em;
+}
