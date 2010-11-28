@@ -234,6 +234,7 @@ window.toolbarView = new ToolbarView;
 
 
 // The splash/login screen.
+
 window.SplashView = Backbone.View.extend({
     el: $('#splash'),
     events: {
@@ -441,6 +442,6 @@ Backbone.history.start(); // route the first hash
 
 
 // Disable selection on sidebar.
-$('#sidebar *').disableSelection();
+$('#items *').disableSelection();
     
 });
