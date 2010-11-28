@@ -336,7 +336,9 @@ $(function() {
             docEditView.hide();
             this.editing = false;
             if (this.selected) {
-                if (!doc.isNew()) {
+                if (doc.isNew()) {
+                    docListView.setSelection(null);
+                } else {
                     docListView.setSelection(this.selected);
                     this.saveLocation('documents/' + this.selected.id);
                 }
