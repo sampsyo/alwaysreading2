@@ -58,7 +58,7 @@ class ModelEncoder(json.JSONEncoder):
 
             # Try to add the key, but don't sweat it if it doesn't have one.
             try:
-                out['key'] = obj.key()
+                out['id'] = obj.key()
             except db.NotSavedError:
                 pass
 

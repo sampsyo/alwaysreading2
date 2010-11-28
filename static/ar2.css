@@ -37,7 +37,7 @@ body {
     padding: 4px 10px;
     cursor: default;
 }
-#doclist li .title {
+#doclist li .description {
     font-size: 1.1em;
 }
 #doclist li.selected {
@@ -95,19 +95,19 @@ body {
     display: none;
 }
 
-#document .title {
+#document .description {
     font-size: 1.5em;
     margin: 1em 0 0;
     font-weight: bold;
     font-family: Helvetica, sans-serif;
 }
-#document #docdisplay .title {
+#document #docdisplay .description {
     margin-bottom: 0.1em;
 }
-#document #docdisplay .title a {
+#document #docdisplay .description a {
     color: black;
 }
-#document #docdisplay .title a:after {
+#document #docdisplay .description a:after {
     content: "\00BB";
     font-size: 0.8em;
 }

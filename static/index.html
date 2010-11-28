@@ -41,13 +41,13 @@
 <!-- templates -->
 
 <script type="text/template" id="doclistitem-template">
-    <span class="title"><%= title %></span>
+    <span class="description"><%= description %></span>
 </script>
 
 <script type="text/template" id="docdisplay-template">
-    <h1 class="title">
+    <h1 class="description">
         <% if (link) { %><a href="<%= link %>" target="_blank"><% } %>
-        <%= title %>
+        <%= description %>
         <% if (link) { %></a><% } %>
     </h1>
     
@@ -59,7 +59,7 @@
 </script>
 
 <script type="text/template" id="docedit-template">
-    <input type="text" name="title" class="title" value="<%= title %>">
+    <input type="text" name="description" class="description" value="<%= description %>">
     
     <p>
         <label for="link">link</label>
