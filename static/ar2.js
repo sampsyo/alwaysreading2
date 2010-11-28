@@ -141,11 +141,10 @@ window.PaperListView = Backbone.CollectionView.extend({
     
     didSelect: function(view) {
         // Scroll the selected item into view.
-        var itemTop = $(view.el).position().top;
-        var itemBottom = itemTop + $(view.el).outerHeight();
-        var windowTop = this.el.scrollTop();
-        var windowBottom = windowTop + this.el.innerHeight();
-        if (itemTop < windowTop || itemBottom > windowBottom) {
+        var top = $(view.el).position().top;
+        var bottom = top + $(view.el).outerHeight();
+        var viewHeight = this.el.innerHeight();
+        if (top < 0 || bottom > viewHeight) {
             $(view.el).each(function() {
                 if (this.scrollIntoView) {
                     this.scrollIntoView();
