@@ -3,12 +3,15 @@ import traceback
 import logging
 import uuid
 import urllib
+import datetime
+import time
 
 sys.path.insert(0, 'lib')
 try:
     import json
 except ImportError:
     import simplejson as json
+import iso8601
 
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
@@ -21,12 +24,18 @@ from google.appengine.api import datastore_errors
 
 # Utility functions.
 
+def string_to_dt(s):
+    """Convert an ISO8601-formatted date string to a datetime object."""
+    return datetime.datetime.fromtimestamp(iso8601.parse(s))
+def dt_to_string(dt):
+    """Convert a datetime object to an ISO8601 string."""
+    return iso8601.tostring(time.mktime(dt.timetuple()))
+
 def render(handler, name, values):
     """Render the given template and send to the client."""
     handler.response.out.write(
         template.render(os.path.join(TEMPLATE_DIR, name), values)
     )
-
 
 def generate_apikey():
     """Generate a unique string of letters and numbers."""
@@ -65,6 +74,8 @@ class ModelEncoder(json.JSONEncoder):
             return out
 
         # Encode various types used by models (incomplete).
+        elif isinstance(obj, datetime.datetime):
+            return dt_to_string(obj)
         elif isinstance(obj, db.Key):
             return str(obj)
         elif isinstance(obj, db.Link):
@@ -98,8 +109,9 @@ class JSONHandler(webapp.RequestHandler):
             logging.error(exc_string)
 
     def reqdata(self):
-        logging.error(urllib.unquote(self.request.body))
-        return json.loads(urllib.unquote(self.request.body))
+        reqstr = urllib.unquote(self.request.body)
+        logging.info('request JSON: ' + reqstr)
+        return json.loads(reqstr)
     
     def send(self, obj):
         self.response.out.write(_json_encoder.encode(obj))
@@ -112,6 +124,10 @@ class Paper(db.Model):
     description = db.StringProperty()
     link = db.LinkProperty()
     tags = db.StringListProperty(default=[])
+    
+    read = db.BooleanProperty(default=False)
+    readdate = db.DateTimeProperty()
+    added = db.DateTimeProperty(auto_now_add=True)
 
 class Settings(db.Model):
     user = db.UserProperty()
@@ -208,7 +224,10 @@ class PaperList(JSONHandler):
         paper.user = user
 
         for key, value in self.reqdata().iteritems():
-            if value and key in ('description', 'link', 'tags'):
+            if value and key in ('description', 'link', 'tags', 'read'):
+                if key == 'link' and not value:
+                    paper.link = None
+                    continue
                 setattr(paper, key, value)
         
         paper.put()
@@ -224,7 +243,10 @@ class SinglePaper(JSONHandler):
         paper = get_paper(self, paper_key)
         
         for key, value in self.reqdata().iteritems():
-            if value and key in ('description', 'link', 'tags'):
+            if key in ('description', 'link', 'tags', 'read'):
+                if key == 'link' and not value:
+                    paper.link = None
+                    continue
                 setattr(paper, key, value)
                 
         paper.put()

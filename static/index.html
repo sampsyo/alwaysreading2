@@ -118,6 +118,12 @@
         <label for="tags">tags (space-separated)</label>
         <input type="text" name="tags" class="tags" value="<%= tagString %>">
     </p>
+    <p>
+        <label for="read" class="read">read</label>
+        <input type="checkbox" name="read" class="read" value="true"
+            <% if (read) { %>checked<% } %>
+        >
+    </p>
     
     <input type="submit" name="save" class="save" value="save">
 </script>

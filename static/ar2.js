@@ -22,7 +22,10 @@ $(function() {
         defaults: {
             'description': 'new document',
             'link': '',
-            'tags': []
+            'tags': [],
+            'read': false,
+            'added': null,
+            'readDate': null
         },
         initialize: function() {
             _.bindAll(this, 'flatten');
@@ -161,6 +164,14 @@ $(function() {
             _.each(this.el.serializeArray(), function(o) {
                 attrs[o.name] = o.value;
             });
+            
+            // Checkbox value.
+            if (attrs['read']) {
+                attrs['read'] = true;
+            } else {
+                attrs['read'] = false;
+            }
+            
             return attrs;
         },
         error: function(model, error) {

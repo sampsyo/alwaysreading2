@@ -154,6 +154,15 @@ body {
 #document #docedit .save:hover {
     background: black;
 }
+#document #docedit p input.read {
+    display: inline;
+    width: auto;
+}
+#document #docedit p label.read {
+    font-size: 1em;
+    display: inline;
+    color: black;
+}
 
 #splash {
     display: none;
