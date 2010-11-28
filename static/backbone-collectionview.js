@@ -23,7 +23,7 @@
         },
     
         addItem: function(model) {
-            if (!model.isNew()) {
+            if (!model.isNew() && this.include(model)) {
                 var view = new (this.itemView)({'model': model});
                 $(this.el).append(view.render().el);
             }
@@ -55,6 +55,10 @@
         },
         
         didSelect: function(view) {
+        },
+        include: function(model) {
+            // Filter the collection.
+            return true;
         }
     });
 

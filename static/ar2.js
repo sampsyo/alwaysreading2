@@ -113,6 +113,7 @@ window.PaperItemView = Backbone.CollectionItemView.extend({
 window.PaperListView = Backbone.CollectionView.extend({
     collection: paperList,
     itemView: PaperItemView,
+    filter: {},
     
     el: $('#paperlist'),
     events: {
@@ -120,6 +121,22 @@ window.PaperListView = Backbone.CollectionView.extend({
     },
     unselect: function(e) {
         app.select(null);
+    },
+    
+    setFilter: function(filter) {
+        this.filter = filter;
+        $(this.el).empty();
+        this.render();
+    },
+    include: function(paper) {
+        var include = true;
+        $.each(this.filter, function(field, value) {
+            if (paper.get(field) != value) {
+                include = false;
+                return;
+            }
+        });
+        return include;
     },
     
     didSelect: function(view) {
@@ -477,6 +494,16 @@ window.ARApp = Backbone.Controller.extend({
         if (this.source != source) {
             sourceListView.select(source);
             this.source = source;
+            
+            var filter = {};
+            if (this.source == SOURCE_ALL) {
+                // No filter.
+            } else if (this.source == SOURCE_READ) {
+                filter['read'] = true;
+            } else {
+                filter['read'] = false;
+            }
+            paperListView.setFilter(filter);
             
             if (topLevel) {
                 this.select(null, true);
