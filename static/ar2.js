@@ -237,33 +237,33 @@ window.SourceListView = Backbone.View.extend({
     selected: null,
     options: [],
     initialize: function() {
-        _.bindAll(this, 'itemClick');
-        this.$('li').live('click', this.itemClick);
+        _.bindAll(this, 'clickGeneral', 'showTags');
+        this.$('.general li').live('click', this.clickGeneral);
         
-        this.clear();
-        this.add('All', SOURCE_ALL);
-        this.add('Unread', SOURCE_UNREAD);
-        this.add('Read', SOURCE_READ);
+        paperList.bind('refresh', this.showTags);
     },
     clear: function() {
         this.el.empty();
-        this.options = [];
-    },
-    add: function(title, value) {
-        this.el.append('<li>' + title + '</li>');
-        this.options.push(value);
     },
     select: function(source) {
         this.selected = source;
-        
         this.$('li').removeClass('selected');
-    
-        var idx = $.inArray(source, this.options);
-        this.$('li').eq(idx).addClass('selected');
+        this.$('li[data-source="' + source + '"]').addClass('selected');
     },
-    itemClick: function(e) {
-        var idx = this.$('li').index(e.currentTarget);
-        app.setSource(this.options[idx], true);
+    clickGeneral: function(e) {
+        var source = $(e.currentTarget).attr('data-source');
+        app.setSource(source, true);
+    },
+    showTags: function(collection) {
+        var allTags = [];
+        collection.each(function(paper) {
+            allTags = allTags.concat(paper.get('tags'));
+        });
+        _.each(_.uniq(allTags), function(tag) {
+            if (tag) {
+                console.log(tag);
+            }
+        });
     }
 });
 window.sourceListView = new SourceListView;

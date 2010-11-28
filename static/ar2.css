@@ -28,15 +28,23 @@ body {
     bottom: 0;
     margin: 0;
     
+    background: #dde4eb;
+}
+#sourcelist ul {
+    margin: 0;
     list-style: none;
     padding: 0;
-    
-    background: #dde4eb;
 }
 #sourcelist li {
     margin: 0;
     padding: 4px 10px;
     cursor: default;
+}
+#sourcelist h3 {
+    font-size: 0.8em;
+    color: #999;
+    margin: 1em 0 0 5px;
+    text-transform: uppercase;
 }
 
 #items {
