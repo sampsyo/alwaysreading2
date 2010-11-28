@@ -5,8 +5,7 @@
         collection: null, // The collection being displayed.
         itemView: null, // A view for displaying a single item in the list.
     
-        subviews: {},
-        selectedView: null,
+        selected: null,
         initialize: function() {
             _.bindAll(this, 'addItem', 'removeItem', 'render',
                             'setSelection', 'saveItem');
@@ -17,8 +16,8 @@
         },
         render: function() {
             this.collection.each(this.addItem);
-            if (this.selectedView) {
-                this.selectedView.setSelected(true);
+            if (this.selected) {
+                this.selected.view.setSelected(true);
             }
             return this;
         },
@@ -27,32 +26,30 @@
             if (!model.isNew()) {
                 var view = new (this.itemView)({'model': model});
                 $(this.el).append(view.render().el);
-                this.subviews[model.id] = view;
             }
         },
         removeItem: function(model) {
-            var view = this.subviews[model.id];
-            if (this.selectedView == view) {
-                this.selectedView = null;
+            if (this.selected == model) {
+                this.selected = null;
             }
-            view.remove();
+            model.view.remove();
         },
         saveItem: function(model) {
             // We don't add unindexed models to the view, so add them now.
-            if (!this.subviews[model.id]) {
+            if (!model.view) {
                 this.addItem(model);
             }
         },
         
-        setSelection: function(id) {
-            if (this.selectedView) {
-                this.selectedView.setSelected(false);
+        setSelection: function(model) {
+            if (this.selected) {
+                this.selected.view.setSelected(false);
             }
-            if (id) {
-                this.selectedView = this.subviews[id];
-                this.selectedView.setSelected(true);
+            if (model) {
+                this.selected = model;
+                this.selected.view.setSelected(true);
             } else {
-                this.selectedView = null;
+                this.selected = null;
             }
         }
     });
