@@ -18,7 +18,7 @@ body {
     -moz-box-shadow: 0 0 20px #666;
 }
 
-#doclist {
+#paperlist {
     width: 18em;
     overflow-y: auto;
     overflow-x: hidden;
@@ -32,15 +32,15 @@ body {
     list-style: none;
     padding: 0;
 }
-#doclist li {
+#paperlist li {
     margin: 0;
     padding: 4px 10px;
     cursor: default;
 }
-#doclist li .description {
+#paperlist li .description {
     font-size: 1.1em;
 }
-#doclist li.selected {
+#paperlist li.selected {
     background: #7abcff;
     background: -moz-linear-gradient(top, #7abcff 0%, #60abf8 44%, #4096ee 100%);
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#7abcff), color-stop(44%,#60abf8), color-stop(100%,#4096ee));
@@ -78,47 +78,47 @@ body {
     background: black;
 }
 
-#document {
+#paper {
     position: fixed;
     top: 0;
     bottom: 0;
     left: 18em;
     margin: 0 0 0 1.5em;
 }
-#document #docdisplay {
+#paper #paperdisplay {
     display: none;
 }
-#document #docedit {
+#paper #paperedit {
     display: none;
 }
 
-#document .description {
+#paper .description {
     font-size: 1.5em;
     margin: 1em 0 0;
     font-weight: bold;
     font-family: Helvetica, sans-serif;
 }
-#document #docdisplay .description {
+#paper #paperdisplay .description {
     margin-bottom: 0.1em;
 }
-#document #docdisplay .description a {
+#paper #paperdisplay .description a {
     color: black;
 }
-#document #docdisplay .description a:after {
+#paper #paperdisplay .description a:after {
     content: "\00BB";
     font-size: 0.8em;
 }
-#document #docdisplay .description .read {
+#paper #paperdisplay .description .read {
     font-size: 0.9em;
 }
-#document #docdisplay .tags {
+#paper #paperdisplay .tags {
     margin-top: 0;
     color: #666;
 }
-#document #docdisplay .tags .tag {
+#paper #paperdisplay .tags .tag {
     margin-right: 0.7em;
 }
-#document #docdisplay button {
+#paper #paperdisplay button {
     display: block;
     
     -webkit-appearance: none;
@@ -130,28 +130,28 @@ body {
     
     cursor: pointer;
 }
-#document #docdisplay button:hover {
+#paper #paperdisplay button:hover {
     background: black;
 }
 
-#document #docedit input {
+#paper #paperedit input {
     font-family: Helvetica, sans-serif;
     width: 400px;
 }
-#document #docedit input.invalid {
+#paper #paperedit input.invalid {
     background: #f33;
 }
-#document #docedit p label {
+#paper #paperedit p label {
     display: block;
     font-weight: bold;
     font-size: 0.8em;
     color: #999;
 }
-#document #docedit p input {
+#paper #paperedit p input {
     display: block;
     font-size: 1em;
 }
-#document #docedit .save {
+#paper #paperedit .save {
     display: block;
     margin: 0.2em 0;
     width: 5em;
@@ -166,14 +166,14 @@ body {
     
     cursor: pointer;
 }
-#document #docedit .save:hover {
+#paper #paperedit .save:hover {
     background: black;
 }
-#document #docedit p input.read {
+#paper #paperedit p input.read {
     display: inline;
     width: auto;
 }
-#document #docedit p label.read {
+#paper #paperedit p label.read {
     font-size: 1em;
     display: inline;
     color: black;

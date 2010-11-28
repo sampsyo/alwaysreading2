@@ -20,7 +20,7 @@
 <body>
 
 <div id="sidebar">
-    <ul id="doclist">
+    <ul id="paperlist">
     </ul>
     <div id="toolbar">
         <button id="editBtn">e</button>
@@ -29,10 +29,10 @@
     </div>
 </div>
 
-<div id="document">
-    <div id="docdisplay">
+<div id="paper">
+    <div id="paperdisplay">
     </div>
-    <form id="docedit">
+    <form id="paperedit">
     </form>
 </div>
 
@@ -89,11 +89,11 @@
 
 <!-- templates -->
 
-<script type="text/template" id="doclistitem-template">
+<script type="text/template" id="paperlistitem-template">
     <span class="description"><%= description %></span>
 </script>
 
-<script type="text/template" id="docdisplay-template">
+<script type="text/template" id="paperdisplay-template">
     <h1 class="description">
         <% if (link) { %><a href="<%= link %>" target="_blank"><% } %>
         <%= description %>
@@ -110,7 +110,7 @@
     <button class="readToggle" title="toggle read">&#10003;</button>
 </script>
 
-<script type="text/template" id="docedit-template">
+<script type="text/template" id="paperedit-template">
     <input type="text" name="description" class="description" value="<%= description %>">
     
     <p>

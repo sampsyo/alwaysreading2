@@ -18,9 +18,9 @@ $(function() {
     
     // Model.
     
-    window.Document = Backbone.Model.extend({
+    window.Paper = Backbone.Model.extend({
         defaults: {
-            'description': 'new document',
+            'description': 'new paper',
             'link': '',
             'tags': [],
             'read': false,
@@ -74,18 +74,18 @@ $(function() {
         }
     });
     
-    window.DocumentList = Backbone.Collection.extend({
-        model: Document,
+    window.PaperList = Backbone.Collection.extend({
+        model: Paper,
         url: '/papers'
     });
-    window.documentList = new DocumentList;
+    window.paperList = new PaperList;
     
     
-    // Document list views.
+    // Paper list views.
     
-    window.DocumentItemView = Backbone.CollectionItemView.extend({
+    window.PaperItemView = Backbone.CollectionItemView.extend({
         tagName: "li",
-        template: _.template($('#doclistitem-template').html()),
+        template: _.template($('#paperlistitem-template').html()),
         events: {
             "click": "select",
             "dblclick": "edit"
@@ -110,11 +110,11 @@ $(function() {
         }
     });
     
-    window.DocumentListView = Backbone.CollectionView.extend({
-        collection: documentList,
-        itemView: DocumentItemView,
+    window.PaperListView = Backbone.CollectionView.extend({
+        collection: paperList,
+        itemView: PaperItemView,
         
-        el: $('#doclist'),
+        el: $('#paperlist'),
         events: {
             "click": "unselect"
         },
@@ -137,27 +137,27 @@ $(function() {
             }
         }
     });
-    window.docListView = new DocumentListView;
+    window.paperListView = new PaperListView;
     
     
-    // Document display/edit views.
+    // Paper display/edit views.
     
     var HideShowView = Backbone.View.extend({
         initialize: function() {
             _.bindAll(this, 'display', 'hide');
         },
-        display: function(doc) {
-            this.el.html(this.template(doc.flatten()));
+        display: function(paper) {
+            this.el.html(this.template(paper.flatten()));
             this.el.show();
         },
-        hide: function(doc) {
+        hide: function() {
             this.el.hide();
         }
     });
     
-    window.DocumentDisplayView = HideShowView.extend({
-        el: $('#docdisplay'),
-        template: _.template($('#docdisplay-template').html()),
+    window.PaperDisplayView = HideShowView.extend({
+        el: $('#paperdisplay'),
+        template: _.template($('#paperdisplay-template').html()),
         events: {
             "click button.readToggle": 'readToggle'
         },
@@ -165,18 +165,18 @@ $(function() {
             app.readToggle();
         }
     });
-    window.docDisplayView = new DocumentDisplayView;
+    window.paperDisplayView = new PaperDisplayView;
     
-    window.DocumentEditView = HideShowView.extend({
-        el: $('#docedit'),
-        template: _.template($('#docedit-template').html()),
+    window.PaperEditView = HideShowView.extend({
+        el: $('#paperedit'),
+        template: _.template($('#paperedit-template').html()),
         events: {
             "submit": "submit"
         },
-        display: function(doc) {
-            HideShowView.prototype.display.call(this, doc);
+        display: function(paper) {
+            HideShowView.prototype.display.call(this, paper);
             _.bindAll(this, 'error');
-            doc.bind('error', this.error);
+            paper.bind('error', this.error);
         },
         submit: function(e) {
             app.save();
@@ -204,11 +204,11 @@ $(function() {
                 this.$('input.' + field).addClass('invalid');
             });
         },
-        focus: function(newDoc) {
+        focus: function(newPaper) {
             this.$('.description').focus();
         }
     });
-    window.docEditView = new DocumentEditView;
+    window.paperEditView = new PaperEditView;
     
     
     // The toolbar controls.
@@ -216,17 +216,17 @@ $(function() {
     window.ToolbarView = Backbone.View.extend({
         el: $('#toolbar'),
         events: {
-            "click #addBtn": "addDocument",
-            "click #removeBtn": "removeDocument",
-            "click #editBtn": "editDocument"
+            "click #addBtn": "addPaper",
+            "click #removeBtn": "removePaper",
+            "click #editBtn": "editPaper"
         },
-        addDocument: function(e) {
+        addPaper: function(e) {
             app.add();
         },
-        removeDocument: function(e) {
+        removePaper: function(e) {
             app.remove();
         },
-        editDocument: function(e) {
+        editPaper: function(e) {
             app.edit();
         }
     });
@@ -313,14 +313,14 @@ $(function() {
         selectedId: null, // for selections before models are loaded
         editing: false,
         routes: {
-            "documents/:docid": "selectId"
+            "papers/:pid": "selectId"
         },
         initialize: function() {
             _.bindAll(this, 'select', 'edit', 'remove', 'save',
                             'ajaxError', 'selectId', 'reselectId');
             
-            // Populate initial document list.
-            documentList.fetch({
+            // Populate initial paper list.
+            paperList.fetch({
                 error: this.ajaxError,
                 success: this.reselectId
             });
@@ -336,9 +336,9 @@ $(function() {
             }
         },
         
-        select: function(doc, force) {
+        select: function(paper, force) {
             // No-op if already selected.
-            if (!force && this.selected == doc) {
+            if (!force && this.selected == paper) {
                 return;
             }
             
@@ -347,36 +347,36 @@ $(function() {
                 this.save();
             }
             
-            this.selected = doc;
-            docEditView.hide();
+            this.selected = paper;
+            paperEditView.hide();
             this.editing = false;
             if (this.selected) {
-                if (doc.isNew()) {
-                    docListView.setSelection(null);
+                if (paper.isNew()) {
+                    paperListView.setSelection(null);
                 } else {
-                    docListView.setSelection(this.selected);
-                    this.saveLocation('documents/' + this.selected.id);
+                    paperListView.setSelection(this.selected);
+                    this.saveLocation('papers/' + this.selected.id);
                 }
-                docDisplayView.display(this.selected);
+                paperDisplayView.display(this.selected);
             } else {
-                docListView.setSelection(null);
-                docDisplayView.hide();
+                paperListView.setSelection(null);
+                paperDisplayView.hide();
                 this.saveLocation('');
             }
         },
         edit: function() {
             if (this.selected) {
-                docDisplayView.hide();
-                docEditView.display(this.selected);
-                docEditView.focus(false);
+                paperDisplayView.hide();
+                paperEditView.display(this.selected);
+                paperEditView.focus(false);
                 this.editing = true;
             }
         },
         add: function() {
-            var doc = new Document;
-            this.select(doc);
+            var paper = new Paper;
+            this.select(paper);
             this.edit();
-            docEditView.focus(true);
+            paperEditView.focus(true);
         },
         remove: function() {
             if (this.selected) {
@@ -386,25 +386,25 @@ $(function() {
                     this.selected.destroy();
                 }
                 this.selected = null;
-                docDisplayView.hide();
-                docEditView.hide();
+                paperDisplayView.hide();
+                paperEditView.hide();
                 this.editing = false;
             }
         },
         save: function() {            
-            if (!this.selected.set(docEditView.values())) {
+            if (!this.selected.set(paperEditView.values())) {
                 // Validation failed.
                 return;
             }
-            docEditView.hide();
-            docDisplayView.display(this.selected);
+            paperEditView.hide();
+            paperDisplayView.display(this.selected);
             this.editing = false;
             
             if (this.selected.isNew()) {
-                // A new document. Add instead of modifying.
-                documentList.add(this.selected);
-                this.selected.save({}, {success: function(doc) {
-                    app.select(doc, true);
+                // A new paper. Add instead of modifying.
+                paperList.add(this.selected);
+                this.selected.save({}, {success: function(paper) {
+                    app.select(paper, true);
                 }});
             } else {
                 this.selected.save();
@@ -414,7 +414,7 @@ $(function() {
         readToggle: function() {
             if (this.selected) {
                 this.selected.set({read: !this.selected.get('read')});
-                docDisplayView.display(this.selected);
+                paperDisplayView.display(this.selected);
                 this.selected.save();
             }
         },
@@ -426,9 +426,9 @@ $(function() {
         },
         
         // For hash URLs.
-        selectId: function(docId) {
-            this.selectedId = docId;
-            this.select(documentList.get(docId));
+        selectId: function(paperId) {
+            this.selectedId = paperId;
+            this.select(paperList.get(paperId));
         },
         reselectId: function() {
             if (this.selectedId) {
