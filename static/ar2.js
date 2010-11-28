@@ -120,6 +120,21 @@ $(function() {
         },
         unselect: function(e) {
             app.select(null);
+        },
+        
+        didSelect: function(view) {
+            // Scroll the selected item into view.
+            var itemTop = $(view.el).position().top;
+            var itemBottom = itemTop + $(view.el).outerHeight();
+            var windowTop = this.el.scrollTop();
+            var windowBottom = windowTop + this.el.innerHeight();
+            if (itemTop < windowTop || itemBottom > windowBottom) {
+                $(view.el).each(function() {
+                    if (this.scrollIntoView) {
+                        this.scrollIntoView();
+                    }
+                });
+            }
         }
     });
     window.docListView = new DocumentListView;

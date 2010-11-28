@@ -48,9 +48,13 @@
             if (model) {
                 this.selected = model;
                 this.selected.view.setSelected(true);
+                this.didSelect(this.selected.view);
             } else {
                 this.selected = null;
             }
+        },
+        
+        didSelect: function(view) {
         }
     });
 
