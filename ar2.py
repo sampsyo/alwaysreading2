@@ -1,3 +1,7 @@
+import sys
+import traceback
+import logging
+
 sys.path.insert(0, 'lib')
 try:
     import json
@@ -54,8 +58,6 @@ class ModelEncoder(json.JSONEncoder):
             return out
 
         # Encode various types used by models (incomplete).
-        elif isinstance(obj, datetime.datetime):
-            return dt_to_string(obj)
         elif isinstance(obj, db.Key):
             return str(obj)
         elif isinstance(obj, db.Link):
@@ -73,7 +75,9 @@ def sendjson(handler, value):
     handler.response.out.write(_encoder.encode(value))
 
 class JSONHandler(webapp.RequestHandler):
-    """A handler that reports errors in JSON instead of in HTML."""
+    """A handler that reports errors in JSON instead of in HTML
+    and gets its request data in JSON format.
+    """
     def handle_exception(self, exc, debug_mode):
         if isinstance(exc, NotFoundError):
             self.error(404)
@@ -91,6 +95,10 @@ class JSONHandler(webapp.RequestHandler):
                 report['exception'] = exc_string
             sendjson(self, report)
             logging.error(exc_string)
+
+    def reqdata(self):
+        logging.error(self.request.body)
+        return json.loads(self.request.body)
 
 
 # Authentication.
@@ -117,9 +125,85 @@ def require_user(handler):
     return user
 
 
+# Model classes.
+
+class Paper(db.Model):
+    description = db.StringProperty()
+    link = db.LinkProperty()
+    tags = db.StringListProperty(default=[])
+
+
+# Model utilities.
+
+def get_paper(handler, key):
+    """Get and return a paper object matching the given key. The paper
+    must belong to the current user. Raises a NotFoundException if
+    there is no match.
+    """
+    try:
+        paper = db.get(db.Key(key))
+    except datastore_errors.BadKeyError:
+        raise NotFoundException()
+    if not isinstance(paper, Paper):
+        raise NotFoundException()
+
+    return paper
+
+
+# Handlers.
+
+class PaperList(JSONHandler):
+    def get(self, tag_filter=None):
+        papers = Paper.all()
+        if tag_filter:
+            not_due.filter('tags =', tag_filter)
+        
+        paper_dict = {}
+        for paper in papers:
+            paper_dict[str(paper.key())] = paper
+            
+        sendjson(self, paper_dict)
+
+    # Add a new paper.
+    def post(self, tag_filter=None):
+        #fixme tag_filter is ignored here.
+        paper = Paper()
+
+        for key, value in self.reqdata().iteritems():
+            if key in ('description', 'link', 'tags'):
+                setattr(paper, key, value)
+        
+        paper.put()
+        
+        sendjson(self, paper)
+
+class SinglePaper(JSONHandler):
+    def get(self, paper_key):
+        sendjson(self, get_paper(self, paper_key))
+
+    # Update a paper.
+    def put(self, paper_key):
+        paper = get_paper(self, paper_key)
+        
+        for key, value in self.reqdata():
+            if key in ('description', 'link', 'tags'):
+                setattr(paper, key, value)
+                
+        paper.put()
+        
+        sendjson(self, paper)
+    
+    def delete(self, paper_key):
+        paper = get_paper(self, paper_key)
+        paper.delete()
+        sendjson(self, {'success': True})
+
+
 # Application setup.
 
 application = webapp.WSGIApplication([
+    (r'/papers/?', PaperList),
+    (r'/papers/(.+)', SinglePaper)
 ], debug=True)
 
 def main():
