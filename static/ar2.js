@@ -321,9 +321,9 @@ $(function() {
             }
         },
         
-        select: function(doc) {
+        select: function(doc, force) {
             // No-op if already selected.
-            if (this.selected == doc) {
+            if (!force && this.selected == doc) {
                 return;
             }
             
@@ -336,9 +336,11 @@ $(function() {
             docEditView.hide();
             this.editing = false;
             if (this.selected) {
-                docListView.setSelection(this.selected.id);
+                if (!doc.isNew()) {
+                    docListView.setSelection(this.selected.id);
+                    this.saveLocation('documents/' + this.selected.id);
+                }
                 docDisplayView.display(this.selected);
-                this.saveLocation('documents/' + this.selected.id);
             } else {
                 docListView.setSelection(null);
                 docDisplayView.hide();
@@ -354,7 +356,7 @@ $(function() {
             }
         },
         add: function() {
-            var doc = documentList.create();
+            var doc = new Document;
             this.select(doc);
             this.edit();
             docEditView.focus(true);
@@ -375,7 +377,17 @@ $(function() {
             }
             docEditView.hide();
             docDisplayView.display(this.selected);
-            this.selected.save();
+            this.editing = false;
+            
+            if (this.selected.isNew()) {
+                // A new document. Add instead of modifying.
+                documentList.add(this.selected);
+                this.selected.save({}, {success: function(doc) {
+                    app.select(doc, true);
+                }});
+            } else {
+                this.selected.save();
+            }
         },
         
         readToggle: function() {

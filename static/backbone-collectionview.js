@@ -5,13 +5,15 @@
         collection: null, // The collection being displayed.
         itemView: null, // A view for displaying a single item in the list.
     
-        subviews: [],
+        subviews: {},
         selectedView: null,
         initialize: function() {
-            _.bindAll(this, 'addItem', 'removeItem', 'render');
+            _.bindAll(this, 'addItem', 'removeItem', 'render',
+                            'setSelection', 'saveItem');
             this.collection.bind("add", this.addItem);
             this.collection.bind("remove", this.removeItem);
             this.collection.bind("refresh", this.render);
+            this.collection.bind("change", this.saveItem);
         },
         render: function() {
             this.collection.each(this.addItem);
@@ -22,9 +24,11 @@
         },
     
         addItem: function(model) {
-            var view = new (this.itemView)({'model': model});
-            $(this.el).append(view.render().el);
-            this.subviews[model.id] = view;
+            if (!model.isNew()) {
+                var view = new (this.itemView)({'model': model});
+                $(this.el).append(view.render().el);
+                this.subviews[model.id] = view;
+            }
         },
         removeItem: function(model) {
             var view = this.subviews[model.id];
@@ -32,6 +36,12 @@
                 this.selectedView = null;
             }
             view.remove();
+        },
+        saveItem: function(model) {
+            // We don't add unindexed models to the view, so add them now.
+            if (!this.subviews[model.id]) {
+                this.addItem(model);
+            }
         },
         
         setSelection: function(id) {
