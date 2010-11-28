@@ -490,5 +490,6 @@ Backbone.history.start(); // route the first hash
 
 // Disable selection on sidebar.
 $('#items *').disableSelection();
+$('#sources *').disableSelection();
     
 });
