@@ -353,6 +353,13 @@ window.SplashView = Backbone.View.extend({
     
     show: function() {
         this.el.show();
+        
+        // Image loading delayed.
+        this.$('#openidSelect a').each(function() {
+            var option = $(this).attr('rel');
+            var url = '/static/openid/' + option.toLowerCase() + '.png';
+            $('img', this).attr('src', url);
+        })
     },
     
     choose: function(e) {
