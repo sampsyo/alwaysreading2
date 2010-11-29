@@ -268,7 +268,7 @@ window.SourceListView = Backbone.View.extend({
     },
     clickTag: function(e) {
         var tag = $(e.currentTarget).text();
-        app.setSource({tag: tag});
+        app.setSource({tag: tag}, true);
     },
     showTags: function(collection) {
         var allTags = [];
@@ -393,12 +393,14 @@ window.ARApp = Backbone.Controller.extend({
     editing: false,
     source: null,
     routes: {
+        "tag/:tag/:paperid": "selectTag",
+        "tag/:tag": "selectTag",
         ":source": "selectItem",
         ":source/:paperid": "selectItem"
     },
     initialize: function() {
-        _.bindAll(this, 'select', 'edit', 'remove', 'save',
-                        'ajaxError', 'selectItem', 'reselectId');
+        _.bindAll(this, 'select', 'edit', 'remove', 'save', 'selectTag',
+                        'ajaxError', 'selectItem', 'reselect');
         
         // Initial source selection.
         this.setSource(SOURCE_UNREAD);
@@ -406,11 +408,18 @@ window.ARApp = Backbone.Controller.extend({
         // Populate initial paper list.
         paperList.fetch({
             error: this.ajaxError,
-            success: this.reselectId
+            success: this.reselect
         });
     },
     curPath: function() {
-        var path = this.source; //TODO assuming source is name
+        var path;
+        if (this.source.tag) {
+            // Tag source.
+            path = 'tag/' + this.source.tag;
+        } else {
+            // General source.
+            path = this.source; // source is source name
+        }
         if (this.selected) {
             path += '/' + this.selected.id
         }
@@ -451,7 +460,7 @@ window.ARApp = Backbone.Controller.extend({
         } else {
             paperListView.setSelection(null);
             paperDisplayView.hide();
-        }    
+        }   
         this.saveLocation(this.curPath());
     },
     edit: function() {
@@ -509,8 +518,8 @@ window.ARApp = Backbone.Controller.extend({
         }
     },
     
-    setSource: function(source, topLevel) {
-        if (this.source != source) {
+    setSource: function(source, topLevel, force) {
+        if (force || this.source != source) {
             sourceListView.select(source);
             this.source = source;
             
@@ -542,12 +551,21 @@ window.ARApp = Backbone.Controller.extend({
     selectItem: function(sourceName, paperId) {
         if (sourceName) {
             var source = sourceName; //TODO assume source is name
-            this.setSource(source);
+            this.setSource(source, true);
         }        
         this.selectedId = paperId;
         this.select(paperList.get(paperId));
     },
-    reselectId: function() {
+    selectTag: function(tag, paperId) {
+        this.setSource({tag: tag}, true);
+        this.selectItem(null, paperId);
+    },
+    reselect: function() {
+        // Called after paper list is loaded.
+        if (this.source.tag) {
+            // Tags weren't loaded when first event fired.
+            this.setSource(this.source, true, true);
+        }
         if (this.selectedId) {
             this.selectItem(null, this.selectedId);
         }
