@@ -213,17 +213,39 @@ def update_paper(paper, data):
                 paper.readdate = datetime.datetime.now()
             setattr(paper, key, value)
 
+def papers_cachekey(user):
+    """Returns the memcache key for a user's paper list.
+    """
+    return 'papers:' + user.user_id()
+
+
 # Handlers.
 
 class PaperList(JSONHandler):
     def get(self, tag_filter=None):
         user = require_user(self)
         
+        # Do we have the list cached?
+        if not tag_filter:
+            res = memcache.get(papers_cachekey(user))
+            if res:
+                self.response.out.write(res)
+                return
+        
+        logging.info('paper list cache miss for ' + str(user))
+        
         papers = Paper.all().filter('user =', user)
         if tag_filter:
-            not_due.filter('tags =', tag_filter)
+            papers.filter('tags =', tag_filter)
+        paper_list = [paper for paper in papers]
         
-        self.send([paper for paper in papers])
+        papers_json = _json_encoder.encode(paper_list)
+        
+        # Cache the list.
+        if not tag_filter:
+            memcache.set(papers_cachekey(user), papers_json)
+        
+        self.response.out.write(papers_json)
 
     # Add a new paper.
     def post(self, tag_filter=None):
@@ -234,6 +256,9 @@ class PaperList(JSONHandler):
         paper.user = user
         update_paper(paper, self.reqdata())
         paper.put()
+        
+        # Invalidate the user's paper cache.
+        memcache.delete(papers_cachekey(user))
         
         self.send(paper)
 
@@ -247,11 +272,14 @@ class SinglePaper(JSONHandler):
         update_paper(paper, self.reqdata())
         paper.put()
         
+        memcache.delete(papers_cachekey(user))
+        
         self.send(paper)
     
     def delete(self, paper_key):
         paper = get_paper(self, paper_key)
         paper.delete()
+        memcache.delete(papers_cachekey(user))
         self.send({'success': True})
 
 class SettingsHandler(JSONHandler):
