@@ -15,6 +15,25 @@ $(function() {
 // https://gist.github.com/249502/
 var urlre = /\b((?:[a-z][\w-]+:(?:\/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))/gi;
 
+// Utility for scrolling boxes to show elements (unintrusively).
+function scrollToShow(outer, inner) {
+    if (!inner.position()) {
+        // No position (i.e., element isn't on the page yet). Skip.
+        return;
+    }
+    var top = inner.position().top;
+    var bottom = top + inner.outerHeight();
+    var viewHeight = outer.innerHeight();
+    if (top < 0 || bottom > viewHeight) {
+        inner.each(function() {
+            var el = inner.get(0);
+            if (el.scrollIntoView) {
+                el.scrollIntoView();
+            }
+        });
+    }
+}
+
 
 // Model.
 
@@ -146,16 +165,7 @@ window.PaperListView = Backbone.CollectionView.extend({
     
     didSelect: function(view) {
         // Scroll the selected item into view.
-        var top = $(view.el).position().top;
-        var bottom = top + $(view.el).outerHeight();
-        var viewHeight = this.el.innerHeight();
-        if (top < 0 || bottom > viewHeight) {
-            $(view.el).each(function() {
-                if (this.scrollIntoView) {
-                    this.scrollIntoView();
-                }
-            });
-        }
+        scrollToShow(this.el, $(view.el));
     }
 });
 window.paperListView = new PaperListView;
@@ -254,13 +264,16 @@ window.SourceListView = Backbone.View.extend({
     select: function(source) {
         this.selected = source;
         this.$('li').removeClass('selected');
+        var li;
         if (source.tag) {
             // Tag source.
-            this.$('li[data-tag="' + source.tag + '"]').addClass('selected');
+            li = this.$('li[data-tag="' + source.tag + '"]');
         } else {
             // General source.
-            this.$('li[data-source="' + source + '"]').addClass('selected');
-        }
+            li = this.$('li[data-source="' + source + '"]');
+        }    
+        li.addClass('selected');
+        scrollToShow(this.el, li);
     },
     clickGeneral: function(e) {
         var source = $(e.currentTarget).attr('data-source');
