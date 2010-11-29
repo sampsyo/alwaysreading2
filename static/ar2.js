@@ -131,7 +131,12 @@ window.PaperListView = Backbone.CollectionView.extend({
     include: function(paper) {
         var include = true;
         $.each(this.filter, function(field, value) {
-            if (paper.get(field) != value) {
+            if (field == 'tag') {
+                if ($.inArray(value, paper.get('tags')) == -1) {
+                    include = false;
+                    return;
+                }
+            } else if (paper.get(field) != value) {
                 include = false;
                 return;
             }
@@ -237,8 +242,9 @@ window.SourceListView = Backbone.View.extend({
     selected: null,
     options: [],
     initialize: function() {
-        _.bindAll(this, 'clickGeneral', 'showTags');
+        _.bindAll(this, 'clickGeneral', 'clickTag', 'showTags');
         this.$('.general li').live('click', this.clickGeneral);
+        this.$('.tags li').live('click', this.clickTag);
         
         paperList.bind('refresh', this.showTags);
     },
@@ -248,20 +254,34 @@ window.SourceListView = Backbone.View.extend({
     select: function(source) {
         this.selected = source;
         this.$('li').removeClass('selected');
-        this.$('li[data-source="' + source + '"]').addClass('selected');
+        if (source.tag) {
+            // Tag source.
+            this.$('li[data-tag="' + source.tag + '"]').addClass('selected');
+        } else {
+            // General source.
+            this.$('li[data-source="' + source + '"]').addClass('selected');
+        }
     },
     clickGeneral: function(e) {
         var source = $(e.currentTarget).attr('data-source');
         app.setSource(source, true);
+    },
+    clickTag: function(e) {
+        var tag = $(e.currentTarget).text();
+        app.setSource({tag: tag});
     },
     showTags: function(collection) {
         var allTags = [];
         collection.each(function(paper) {
             allTags = allTags.concat(paper.get('tags'));
         });
-        _.each(_.uniq(allTags), function(tag) {
+        allTags = _.uniq(allTags);
+        allTags.sort();
+        _.each(allTags, function(tag) {
             if (tag) {
-                console.log(tag);
+                this.$('.tags').append(
+                    '<li data-tag="' + tag + '">' + tag + '</li>'
+                );
             }
         });
     }
@@ -499,8 +519,10 @@ window.ARApp = Backbone.Controller.extend({
                 // No filter.
             } else if (this.source == SOURCE_READ) {
                 filter['read'] = true;
-            } else {
+            } else if (this.source == SOURCE_UNREAD) {
                 filter['read'] = false;
+            } else if (this.source.tag) {
+                filter['tag'] = this.source.tag;
             }
             paperListView.setFilter(filter);
             

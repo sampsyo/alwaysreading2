@@ -28,6 +28,9 @@ body {
     bottom: 0;
     margin: 0;
     
+    overflow-y: auto;
+    overflow-x: hidden;
+    
     background: #dde4eb;
 }
 #sourcelist ul {
