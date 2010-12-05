@@ -222,34 +222,29 @@ def papers_cachekey(user):
 # Handlers.
 
 class PaperList(JSONHandler):
-    def get(self, tag_filter=None):
+    def get(self):
         user = require_user(self)
         
         # Do we have the list cached?
-        if not tag_filter:
-            res = memcache.get(papers_cachekey(user))
-            if res:
-                self.response.out.write(res)
-                return
+        res = memcache.get(papers_cachekey(user))
+        if res:
+            self.response.out.write(res)
+            return
         
         logging.info('paper list cache miss for ' + str(user))
         
         papers = Paper.all().filter('user =', user)
-        if tag_filter:
-            papers.filter('tags =', tag_filter)
         paper_list = [paper for paper in papers]
         
         papers_json = _json_encoder.encode(paper_list)
         
         # Cache the list.
-        if not tag_filter:
-            memcache.set(papers_cachekey(user), papers_json)
+        memcache.set(papers_cachekey(user), papers_json)
         
         self.response.out.write(papers_json)
 
     # Add a new paper.
-    def post(self, tag_filter=None):
-        #fixme tag_filter is ignored here.
+    def post(self):
         user = require_user(self)
         
         paper = Paper()
