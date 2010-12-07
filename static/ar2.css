@@ -2,11 +2,52 @@ body {
     font-family: Helvetica, sans-serif;
 }
 
+#header {
+	position: fixed;
+	left: 0;
+	right: 0;
+	top: 0;
+	height: 1.7em;
+	
+	background: #666;
+	color: white;
+	
+	z-index: 2;
+	
+	/* shadowy border */
+    box-shadow: 0 0 20px #999;
+    -webkit-box-shadow: 0 0 20px #999;
+    -moz-box-shadow: 0 0 20px #999;
+}
+#header h1 {
+	font-size: 1em;
+	font-weight: bold;
+	margin: 0.25em;
+	float: left;
+}
+#header .buttongroup {
+	float: right;
+}
+#header button, #header a {
+	-webkit-appearance: none;
+    border: 0;
+    background: transparent;
+	color: white;
+	font-size: 1em;
+	margin: 0;
+	padding: 0.25em 0.4em;
+	display: inline-block;
+	text-decoration: none;
+}
+#header button:hover, #header a:hover {
+	background: black;
+}
+
 #sources {
     width: 10em;
     
     position: fixed;
-    top: 0;
+    top: 1.7em;
     left: 0;
     bottom: 0;
     margin: 0;
@@ -23,7 +64,7 @@ body {
     width: 10em;
     
     position: fixed;
-    top: 0;
+    top: 1.7em;
     left: 0;
     bottom: 0;
     margin: 0;
@@ -54,7 +95,7 @@ body {
     width: 18em;
     
     position: fixed;
-    top: 0;
+    top: 1.7em;
     left: 10em;
     bottom: 0;
     margin: 0;
@@ -71,7 +112,7 @@ body {
     overflow-x: hidden;
     
     position: fixed;
-    top: 0;
+    top: 1.7em;
     bottom: 2em;
     margin: 0;
     left: 10em;
@@ -128,7 +169,7 @@ body {
 
 #paper {
     position: fixed;
-    top: 0;
+    top: 0.7em;
     bottom: 0;
     left: 28em;
     margin: 0 0 0 1.5em;
@@ -236,7 +277,7 @@ body {
     left: 0;
     right: 0;
     
-    z-index: 2;
+    z-index: 5;
 }
 #splash #screen {
     position: fixed;
